@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Account - Dahabi Pay</title>
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<div data-shell-header></div>
+
+<main>
+  <div class="shell">
+    <div class="dash">
+      <div data-shell-side></div>
+
+      <div>
+        <div class="section__head" style="margin-top:0">
+          <h2>My Account</h2>
+          <a class="btn btn--sm" href="../index.html">Top up by exchange</a>
+        </div>
+
+        <p class="muted small" style="margin-bottom:18px">
+          Internal balances settle instantly and carry no exchange fee when used as
+          the sending side of an order.
+        </p>
+
+        <div class="stats" data-render="balances"></div>
+
+        <div class="card" style="margin-top:20px" id="withdraw">
+          <h3 style="margin-bottom:16px">Withdraw from balance</h3>
+          <form class="form" data-form="withdraw" novalidate>
+            <div class="form__field">
+              <label>Payment system <i>*</i></label>
+              <select class="select" name="system" data-cur-options></select>
+            </div>
+            <div class="form__field">
+              <label>Account number / requisite <i>*</i></label>
+              <input class="input" name="account" data-rule="required" autocomplete="off">
+              <span class="hint">Checked against the payment system's own format before the request is queued.</span>
+            </div>
+            <div class="form__field">
+              <label>Amount <i>*</i></label>
+              <input class="input" name="amount" inputmode="decimal" data-rule="required" placeholder="0.00">
+            </div>
+            <div class="form__field">
+              <label>PIN code</label>
+              <input class="input" name="pin" inputmode="numeric" autocomplete="off"
+                     placeholder="required if you set one">
+            </div>
+            <div class="form__field">
+              <label>Captcha <i>*</i></label>
+              <div class="captcha">
+                <span class="captcha__img"></span>
+                <button type="button" class="captcha__reload" title="New code">&#8635;</button>
+                <input class="input" data-captcha-input placeholder="Enter the code" autocomplete="off">
+              </div>
+            </div>
+            <div><button class="btn" type="submit">Request withdrawal</button></div>
+          </form>
+        </div>
+
+        <div class="card" style="margin-top:18px">
+          <h3 style="margin-bottom:14px">Withdrawal requests</h3>
+          <div class="table-wrap" style="box-shadow:none">
+            <table class="tbl" style="min-width:620px">
+              <thead><tr><th>Requested</th><th>System</th><th>Amount</th><th>Requisite</th><th>Status</th></tr></thead>
+              <tbody data-render="withdrawals">
+                <tr><td colspan="5" class="center muted" style="padding:22px">Loading&hellip;</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:18px">
+          <h3 style="margin-bottom:6px">Balance movements</h3>
+          <p class="muted small" style="margin-bottom:14px">
+            Every credit and debit, so a balance can always be reconciled against its history.
+          </p>
+          <div class="table-wrap" style="box-shadow:none">
+            <table class="tbl" style="min-width:560px">
+              <thead><tr><th>When</th><th>Currency</th><th>Change</th><th>Reason</th></tr></thead>
+              <tbody data-render="ledger">
+                <tr><td colspan="4" class="center muted" style="padding:22px">Loading&hellip;</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card card--alt" style="margin-top:18px">
+          <h3 style="margin-bottom:10px;font-size:16px">Withdrawal rules</h3>
+          <ul class="small muted" style="padding-left:18px;margin:0;display:grid;gap:7px">
+            <li>Requests are queued for the next automated payout run, at most 30 minutes.</li>
+            <li>The receiving requisite must belong to the account holder.</li>
+            <li>A PIN code is required when one is set on the profile.</li>
+            <li>Network fees are deducted from the withdrawn amount.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div data-shell-footer></div>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/forms.js"></script>
+</body>
+</html>

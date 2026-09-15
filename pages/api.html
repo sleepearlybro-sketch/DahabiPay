@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rates API (XML) - Dahabi Pay</title>
+<link rel="stylesheet" href="../assets/css/app.css">
+<style>
+  .xml{
+    background:#04283f;color:#d7e7f5;border-radius:var(--r-md);padding:18px;
+    overflow:auto;max-height:460px;font:500 12.5px/1.6 ui-monospace,Consolas,monospace;
+    margin:0;
+  }
+  .xml .t{color:#7fd3a0}
+  .xml .v{color:#ffd479}
+</style>
+</head>
+<body>
+
+<div data-shell-header></div>
+
+<main>
+  <div class="shell">
+    <section class="section">
+      <div class="doc" style="max-width:960px">
+        <h2>Rates API</h2>
+        <p>Rates, reserves and direction limits are published as an XML feed in the layout expected by the common exchanger monitors, so a listing needs no custom integration.</p>
+
+        <h3>Endpoint</h3>
+        <div class="copybox" style="margin-bottom:18px">
+          <code>GET https://dahabipay.example/api/v1/rates.xml</code>
+          <button class="btn btn--sm btn--ghost" data-copy="https://dahabipay.example/api/v1/rates.xml">Copy</button>
+        </div>
+
+        <h3>Fields</h3>
+        <div class="table-wrap" style="box-shadow:none;border:1px solid var(--line-2)">
+          <table class="tbl">
+            <thead><tr><th>Element</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><b>from</b> / <b>to</b></td><td>Currency codes of the direction.</td></tr>
+              <tr><td><b>in</b> / <b>out</b></td><td>Rate expressed as a ratio: <code>in</code> units of <code>from</code> give <code>out</code> units of <code>to</code>.</td></tr>
+              <tr><td><b>amount</b></td><td>Available reserve in the receiving currency.</td></tr>
+              <tr><td><b>minamount</b> / <b>maxamount</b></td><td>Limits on the sending side, with the unit.</td></tr>
+              <tr><td><b>fromfee</b></td><td>Service fee taken on the sending side.</td></tr>
+              <tr><td><b>param</b></td><td><code>manual</code> for operator-handled directions; absent when automated.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Live sample</h3>
+        <p class="small muted">Generated from the same dataset the exchanger uses - first 12 directions.</p>
+        <pre class="xml" data-xml></pre>
+
+        <h3>Other endpoints</h3>
+        <div class="table-wrap" style="box-shadow:none;border:1px solid var(--line-2)">
+          <table class="tbl">
+            <thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><b>GET</b></td><td><code>/api/v1/currencies</code></td><td>Currency table with reserves and limits.</td></tr>
+              <tr><td><b>GET</b></td><td><code>/api/v1/directions</code></td><td>Open pairs.</td></tr>
+              <tr><td><b>POST</b></td><td><code>/api/v1/orders</code></td><td>Create an application; returns id and deposit address.</td></tr>
+              <tr><td><b>GET</b></td><td><code>/api/v1/orders/:id</code></td><td>Application status.</td></tr>
+              <tr><td><b>POST</b></td><td><code>/api/v1/webhooks/payment</code></td><td>Payment watcher callback that advances status.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div data-shell-footer></div>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/exchanger.js"></script>
+<script>
+  // Build the monitor-format feed straight from the dataset.
+  document.addEventListener('DOMContentLoaded', function () {
+    var pre = document.querySelector('[data-xml]');
+    if (!pre) return;
+
+    var rows = [];
+    EP.currencies.forEach(function (f) {
+      EP.currencies.forEach(function (t) {
+        if (EP.allowed(f, t)) rows.push([f, t]);
+      });
+    });
+
+    function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+    function el(name, val) {
+      return '  <span class="t">&lt;' + name + '&gt;</span><span class="v">' + esc(val) +
+             '</span><span class="t">&lt;/' + name + '&gt;</span>';
+    }
+
+    var out = ['<span class="t">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>',
+               '<span class="t">&lt;rates&gt;</span>'];
+    rows.slice(0, 12).forEach(function (p) {
+      var f = p[0], t = p[1], r = EP.rate(f, t);
+      // normalise so the smaller side is 1
+      var inAmt = r < 1 ? (1 / r).toFixed(6).replace(/0+$/, '') : '1';
+      var outAmt = r < 1 ? '1' : r.toFixed(6).replace(/0+$/, '');
+      out.push('<span class="t">&lt;item&gt;</span>');
+      out.push(el('from', f.code + (f.net ? f.net : '')));
+      out.push(el('to', t.code + (t.net ? t.net : '')));
+      out.push(el('in', inAmt));
+      out.push(el('out', outAmt));
+      out.push(el('amount', t.reserve));
+      out.push(el('minamount', f.min + ' ' + f.code));
+      out.push(el('maxamount', f.max + ' ' + f.code));
+      out.push(el('fromfee', (f.fee * 100).toFixed(1) + '%'));
+      out.push('<span class="t">&lt;/item&gt;</span>');
+    });
+    out.push('<span class="t">&lt;/rates&gt;</span>');
+    pre.innerHTML = out.join('\n');
+  });
+</script>
+</body>
+</html>

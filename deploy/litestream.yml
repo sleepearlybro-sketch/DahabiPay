@@ -1,0 +1,28 @@
+# =============================================================================
+# Litestream - continuous SQLite replication.
+#
+# Restore with:
+#   litestream restore -o /data/exchangepay.db s3://YOUR-BUCKET/exchangepay
+#
+# Any S3-compatible bucket works: AWS S3, Backblaze B2, Cloudflare R2,
+# DigitalOcean Spaces, Hetzner Object Storage.
+# =============================================================================
+
+dbs:
+  - path: /data/exchangepay.db
+    replicas:
+      - type: s3
+        bucket: CHANGE-ME-your-bucket
+        path: exchangepay
+        # Leave `endpoint` unset for AWS S3. For anyone else, set it:
+        #   Backblaze B2:  s3.us-west-004.backblazeb2.com
+        #   Cloudflare R2: <account-id>.r2.cloudflarestorage.com
+        #   DO Spaces:     fra1.digitaloceanspaces.com
+        # endpoint: s3.us-west-004.backblazeb2.com
+        region: us-east-1
+
+        # A write is replicated within a second; a full snapshot daily, with
+        # 720 hours (30 days) of history kept for point-in-time restore.
+        sync-interval: 1s
+        snapshot-interval: 24h
+        retention: 720h

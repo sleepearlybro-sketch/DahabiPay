@@ -1,0 +1,47 @@
+# =============================================================================
+# Caddy in front of Dahabi Pay.
+# TLS certificates are obtained and renewed automatically from Let's Encrypt;
+# there is nothing to configure and nothing to remember to renew.
+# =============================================================================
+
+{$DOMAIN} {
+	tls {$ACME_EMAIL}
+
+	encode gzip zstd
+
+	# Security headers. HSTS is deliberately long: once you are on HTTPS you
+	# do not want a downgrade to be possible.
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "geolocation=(), microphone=(), camera=()"
+		-Server
+	}
+
+	# The monitor feed is polled hard by aggregators; let Caddy serve it from
+	# cache-control rather than waking the app every time.
+	@feed path /api/v1/rates.xml /api/v1/rates.json
+	header @feed Cache-Control "public, max-age=60"
+
+	# The operator panel is worth restricting to known networks. Uncomment and
+	# set your own addresses - it is a second lock on top of the role check.
+	# @admin path /admin*
+	# handle @admin {
+	# 	@notmine not remote_ip 203.0.113.4 198.51.100.0/24
+	# 	respond @notmine 403
+	# 	reverse_proxy app:3000
+	# }
+
+	reverse_proxy app:3000 {
+		header_up X-Real-IP {remote_host}
+	}
+
+	log {
+		output file /data/access.log {
+			roll_size 20MiB
+			roll_keep 10
+		}
+	}
+}

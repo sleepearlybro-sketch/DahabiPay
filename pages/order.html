@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Create an exchange - Dahabi Pay</title>
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<div data-shell-header></div>
+
+<main>
+  <div class="shell" data-order>
+
+    <section class="section">
+      <div class="progress">
+        <div class="progress__i is-done"><b>Step 1</b>Select currencies</div>
+        <div class="progress__i is-now"><b>Step 2</b>Pay for the application</div>
+        <div class="progress__i"><b>Step 3</b>Get your coins</div>
+      </div>
+
+      <div class="order-grid">
+
+        <!-- ------------------------------------------------ stage: form -->
+        <div data-stage="form">
+          <div class="card">
+            <h2 class="card__title">Your details</h2>
+            <p class="muted small" style="margin-bottom:20px">
+              We need a receiving requisite and an email for status notifications.
+              Nothing else is stored.
+            </p>
+
+            <form class="form" novalidate>
+              <div class="form__field">
+                <label>Receive to: <span data-req-label></span> <i>*</i></label>
+                <input class="input" name="requisite" data-rule="required" autocomplete="off">
+                <span class="hint">Double-check this - payouts to a wrong requisite cannot be reversed.</span>
+              </div>
+
+              <div class="form__field">
+                <label>Email <i>*</i></label>
+                <input class="input" name="email" type="email" data-rule="required email" autocomplete="email">
+              </div>
+
+              <div class="form__field">
+                <label>Name on the receiving account</label>
+                <input class="input" name="holder" autocomplete="name">
+                <span class="hint">Required by some mobile money and cash pickup rails.</span>
+              </div>
+
+              <div class="form__field">
+                <label>Comment for the operator</label>
+                <textarea class="input" name="note" rows="3"></textarea>
+              </div>
+
+              <div class="form__field">
+                <label>Captcha <i>*</i></label>
+                <div class="captcha">
+                  <span class="captcha__img"></span>
+                  <button type="button" class="captcha__reload" title="New code">&#8635;</button>
+                  <input class="input" data-captcha-input placeholder="Enter the code" autocomplete="off">
+                </div>
+              </div>
+
+              <label class="check">
+                <input type="checkbox" data-agree>
+                <span>I have read and accept the <a href="agreement.html">User Agreement</a>,
+                the <a href="aml-kyc.html">AML/KYC Policy</a> and the
+                <a href="returns.html">Returns Policy</a>.</span>
+              </label>
+
+              <button class="btn btn--lg btn--block" type="submit">Create the application</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- ------------------------------------------------- stage: pay -->
+        <div data-stage="pay" hidden>
+          <div class="card">
+            <div class="section__head" style="margin-bottom:14px">
+              <h2 style="font-size:26px">Application <span data-oid class="mono"></span></h2>
+              <span data-statusbox></span>
+            </div>
+
+            <p class="muted small">
+              Send the exact amount below in a single transfer. The order settles
+              automatically once the required confirmations arrive.
+            </p>
+
+            <div class="kv" style="margin:18px 0">
+              <div><span>Amount to send</span><b data-pay-amt></b></div>
+              <div><span>Payout to</span><b data-pay-to></b></div>
+            </div>
+
+            <label style="font-size:13px;font-weight:700;display:block;margin-bottom:6px">Pay to this address</label>
+            <div class="copybox">
+              <code data-addr></code>
+              <button class="btn btn--sm btn--ghost" data-copybtn data-copy="">Copy</button>
+            </div>
+
+            <p style="margin-top:18px"><span class="timer" data-timer>20:00 left to pay</span></p>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+              <button class="btn" data-paid>I have paid</button>
+              <button class="btn btn--ghost" data-cancel hidden>Cancel this application</button>
+              <a class="btn btn--ghost" href="history.html">Transaction history</a>
+            </div>
+
+            <div data-timeline style="margin-top:22px"></div>
+
+            <div data-timeline style="margin-top:22px"></div>
+
+            <p class="small" data-done-note hidden
+               style="margin-top:18px;padding:14px;border-radius:10px;background:rgba(95,175,18,.12);color:#40760c;font-weight:700">
+              Funds have been sent to your requisite. A receipt was emailed to you.
+            </p>
+          </div>
+        </div>
+
+        <!-- ------------------------------------------------------ aside -->
+        <aside>
+          <div class="card">
+            <h3 style="margin-bottom:14px">Order summary</h3>
+            <div class="kv" data-sum></div>
+          </div>
+          <div class="card card--alt" style="margin-top:16px">
+            <h3 style="margin-bottom:10px;font-size:16px">Good to know</h3>
+            <ul class="small muted" style="padding-left:18px;margin:0;display:grid;gap:7px">
+              <li>The quote is locked for 20 minutes from creation.</li>
+              <li>Send one transfer for the exact amount - split payments are processed manually.</li>
+              <li>Network fees on the sending side are paid by you.</li>
+              <li>Need help? Message the operator on Telegram, 24/7.</li>
+              <li>This page refreshes itself - leave it open to watch the status.</li>
+            </ul>
+          </div>
+        </aside>
+
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<div data-shell-footer></div>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/exchanger.js"></script>
+<script src="../assets/js/forms.js"></script>
+</body>
+</html>

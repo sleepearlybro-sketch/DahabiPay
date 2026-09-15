@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sign in - Dahabi Pay</title>
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<div data-shell-header></div>
+
+<main>
+  <div class="shell">
+    <div class="auth">
+      <div class="card">
+        <h2 class="card__title">Sign in</h2>
+        <p class="muted small" style="margin-bottom:22px">
+          Access your profile, saved requisites and transaction history.
+        </p>
+
+        <form class="form" data-form="signin" novalidate>
+          <div class="form__field">
+            <label>Login or email <i>*</i></label>
+            <input class="input" name="login" data-rule="required" autocomplete="username">
+          </div>
+
+          <div class="form__field">
+            <label>Password <i>*</i></label>
+            <input class="input" name="password" type="password" data-rule="required" autocomplete="current-password">
+          </div>
+
+          <div class="form__field">
+            <label>Personal PIN code</label>
+            <input class="input" name="pin" inputmode="numeric" data-rule="pin" autocomplete="off">
+            <span class="hint">Only required if you enabled a PIN on your account.</span>
+          </div>
+
+          <div class="form__field">
+            <label>Captcha <i>*</i></label>
+            <div class="captcha">
+              <span class="captcha__img"></span>
+              <button type="button" class="captcha__reload" title="New code">&#8635;</button>
+              <input class="input" data-captcha-input placeholder="Enter the code" autocomplete="off">
+            </div>
+          </div>
+
+          <button class="btn btn--lg btn--block" type="submit">Sign in</button>
+
+          <div class="form__foot">
+            <a href="forgot.html">Forgot your password?</a>
+          </div>
+          <div class="divider">OR</div>
+          <div class="form__foot">
+            No account yet? <a href="signup.html">Create one</a>
+          </div>
+        </form>
+      </div>
+
+      <p class="small muted center" style="margin-top:16px">
+        Opened without the server running? The page falls back to an offline demo
+        and any values sign you in locally.
+      </p>
+    </div>
+  </div>
+</main>
+
+<div data-shell-footer></div>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/forms.js"></script>
+</body>
+</html>

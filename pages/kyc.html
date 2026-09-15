@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Verification - Dahabi Pay</title>
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<div data-shell-header></div>
+
+<main>
+  <div class="shell">
+    <div class="dash">
+      <div data-shell-side></div>
+
+      <div data-kyc>
+        <div class="section__head" style="margin-top:0">
+          <h2>Verification</h2>
+          <a class="btn btn--sm btn--ghost" href="aml-kyc.html">Why we ask</a>
+        </div>
+
+        <div class="card card--alt" style="margin-bottom:18px">
+          <h3 style="font-size:16px;margin-bottom:8px">You probably do not need this</h3>
+          <p class="small muted">
+            Routine exchanges within the published limits need no documents. Verification
+            is requested only where our <a href="aml-kyc.html">AML/KYC Policy</a> requires
+            it &mdash; high cumulative volume, a flagged counterparty, or a refund request.
+            Upload something here only if an operator has asked you to.
+          </p>
+        </div>
+
+        <div class="card" style="margin-bottom:18px">
+          <h3 style="margin-bottom:14px">Current status</h3>
+          <div class="kv" data-kyc-state>
+            <div><span>Loading</span><b>&hellip;</b></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:18px">
+          <h3 style="margin-bottom:6px">Upload a document</h3>
+          <p class="muted small" style="margin-bottom:18px">
+            JPEG, PNG, WebP or PDF, up to 6 MB. Documents are stored outside the web
+            root, are never served over HTTP, and are visible only to compliance staff.
+          </p>
+
+          <form class="form" data-form="kyc" novalidate>
+            <div class="form__field">
+              <label>Document type <i>*</i></label>
+              <select class="select" name="kind">
+                <option value="id_front">Identity document &mdash; front</option>
+                <option value="id_back">Identity document &mdash; back</option>
+                <option value="selfie">Selfie holding the document</option>
+                <option value="address">Proof of address</option>
+                <option value="sof">Proof of source of funds</option>
+              </select>
+            </div>
+
+            <div class="form__field">
+              <label>File <i>*</i></label>
+              <input class="input" name="file" type="file"
+                     accept="image/jpeg,image/png,image/webp,application/pdf">
+              <span class="hint" data-file-hint>Nothing selected.</span>
+            </div>
+
+            <div><button class="btn" type="submit">Upload for review</button></div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom:14px">Your documents</h3>
+          <div class="table-wrap" style="box-shadow:none">
+            <table class="tbl" style="min-width:520px">
+              <thead><tr><th>Type</th><th>Size</th><th>Uploaded</th><th>Status</th></tr></thead>
+              <tbody data-kyc-docs>
+                <tr><td colspan="4" class="center muted" style="padding:22px">Loading&hellip;</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div data-shell-footer></div>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/forms.js"></script>
+</body>
+</html>

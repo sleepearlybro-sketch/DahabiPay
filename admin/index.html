@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Operator panel - Dahabi Pay</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="/assets/css/app.css">
+<link rel="stylesheet" href="assets/admin.css">
+</head>
+<body class="adm">
+
+<header class="adm__top">
+  <a class="logo" href="#/">
+    <span class="logo__mark">D</span>
+    <span><span class="logo__text">Dahabi <em>Pay</em></span>
+    <span class="logo__sub">operator panel</span></span>
+  </a>
+  <div class="adm__top-right">
+    <span class="adm__env" data-env></span>
+    <span class="adm__who" data-who></span>
+    <a class="btn btn--sm btn--light" href="/" target="_blank" rel="noopener">View site</a>
+    <button class="btn btn--sm btn--ghost" style="--btn-bd:rgba(255,255,255,.5);--btn-fg:#fff" data-signout>Sign out</button>
+  </div>
+</header>
+
+<div class="adm__body">
+  <nav class="adm__nav" data-nav hidden>
+    <a href="#/">Dashboard <b data-badge="attention"></b></a>
+    <a href="#/orders">Orders</a>
+    <a href="#/currencies">Currencies &amp; rates</a>
+    <a href="#/directions">Directions</a>
+    <a href="#/users">Users</a>
+    <a href="#/kyc">KYC <b data-badge="kyc"></b></a>
+    <a href="#/withdrawals">Withdrawals <b data-badge="withdrawals"></b></a>
+    <a href="#/reviews">Reviews <b data-badge="reviews"></b></a>
+    <a href="#/rates">Rate feed</a>
+    <a href="#/audit">Audit log</a>
+    <a href="#/settings">Settings</a>
+  </nav>
+
+  <main class="adm__view" data-view>
+    <div class="adm__loading">Loading…</div>
+  </main>
+</div>
+
+<!-- confirmation dialog for anything that moves money -->
+<div class="adm__modal" data-modal hidden>
+  <div class="adm__modal-veil" data-modal-cancel></div>
+  <div class="adm__modal-box">
+    <h3 data-modal-title>Confirm</h3>
+    <p class="muted small" data-modal-body></p>
+    <div data-modal-fields></div>
+    <div class="form__field" data-modal-reason-wrap>
+      <label>Reason <i>*</i></label>
+      <input class="input" data-modal-reason placeholder="Recorded in the audit log">
+    </div>
+    <div class="form__field" data-modal-confirm-wrap hidden>
+      <label>Type <code data-modal-word></code> to confirm</label>
+      <input class="input" data-modal-confirm autocomplete="off">
+    </div>
+    <div class="adm__modal-actions">
+      <button class="btn btn--ghost btn--sm" data-modal-cancel>Cancel</button>
+      <button class="btn btn--sm" data-modal-ok>Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toasts"></div>
+
+<script src="assets/admin.js" type="module"></script>
+</body>
+</html>

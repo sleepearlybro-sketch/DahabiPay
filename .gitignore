@@ -1,0 +1,9 @@
+node_modules/
+data/*
+!data/audit-20260914/
+data/audit-20260914/*
+!data/audit-20260914/PROJECT_AUDIT.md
+!data/audit-20260914/probes.mjs
+.env
+*.log
+.DS_Store

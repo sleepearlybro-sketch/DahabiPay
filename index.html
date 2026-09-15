@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dahabi Pay - Electronic currencies exchanger</title>
+<meta name="description" content="Safe, easy, instant exchange between cryptocurrencies, electronic accounts and mobile money. 24/7 automated transactions.">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+<div data-shell-header></div>
+
+<main>
+  <div class="shell">
+
+    <!-- ------------------------------------------------------------ hero -->
+    <section class="hero">
+      <div class="hero__copy">
+        <span class="pill">24/7 exchange</span>
+        <h1>Safe, easy,<br>instant</h1>
+        <p class="hero__lead">
+          Move value between crypto, electronic accounts and mobile money in
+          minutes. Rates are quoted live, orders are processed automatically,
+          and an operator is on hand around the clock.
+        </p>
+        <div class="hero__stats">
+          <div class="hero__stat"><b>23</b><span>currencies &amp; rails</span></div>
+          <div class="hero__stat"><b>5-15 min</b><span>typical settlement</span></div>
+          <div class="hero__stat"><b>24/7</b><span>automated payouts</span></div>
+        </div>
+      </div>
+      <div data-exchanger></div>
+    </section>
+
+    <!-- ----------------------------------------------------------- steps -->
+    <section class="section">
+      <div class="steps" data-render="steps"></div>
+    </section>
+
+    <!-- ------------------------------------------------------ advantages -->
+    <section class="section adv">
+      <div>
+        <h2>Why Choose<span>Dahabi Pay?</span></h2>
+        <p class="adv__lead">
+          Exchange becomes easier when your convenience is taken care of in advance.
+        </p>
+        <p style="margin-top:20px">
+          <a class="btn btn--ghost" href="pages/about.html">About the service</a>
+        </p>
+      </div>
+      <ul class="adv__list" data-render="advantages"></ul>
+    </section>
+
+    <!-- ------------------------------------------------- rates shortcuts -->
+    <section class="section">
+      <div class="section__head">
+        <h2>Popular directions</h2>
+        <a href="pages/rates.html">All rates &amp; reserves &#8594;</a>
+      </div>
+      <div class="table-wrap" data-render="rates" data-limit="8">
+        <table class="tbl">
+          <thead><tr><th>You send</th><th>You get</th><th>Rate</th><th>Limits</th><th>Reserve</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- --------------------------------------------------------- reviews -->
+    <section class="section">
+      <div class="section__head">
+        <h2>Reviews</h2>
+        <a href="pages/reviews.html">All reviews &#8594;</a>
+      </div>
+      <div class="reviews" data-render="reviews" data-limit="6"></div>
+    </section>
+
+    <!-- ------------------------------------------------------------ news -->
+    <section class="section">
+      <div class="section__head">
+        <h2>News</h2>
+        <a href="pages/news.html">All news &#8594;</a>
+      </div>
+      <div class="news" data-render="news" data-limit="3"></div>
+    </section>
+
+    <!-- -------------------------------------------------------- partners -->
+    <section class="section">
+      <div class="section__head"><h2>Partners</h2></div>
+      <div class="partners" data-render="partners"></div>
+    </section>
+
+  </div>
+</main>
+
+<div data-shell-footer></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/exchanger.js"></script>
+</body>
+</html>

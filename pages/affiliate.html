@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Affiliate account - Dahabi Pay</title>
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<div data-shell-header></div>
+
+<main>
+  <div class="shell">
+    <div class="dash">
+      <div data-shell-side></div>
+
+      <div data-affiliate>
+        <div class="section__head" style="margin-top:0">
+          <h2>Affiliate account</h2>
+          <a class="btn btn--sm btn--ghost" href="affiliate-terms.html">Programme terms</a>
+        </div>
+
+        <div class="stats" data-aff-stats>
+          <div class="stat"><span>Loading</span><b>&hellip;</b></div>
+        </div>
+
+        <div class="card" style="margin-top:18px">
+          <h3 style="margin-bottom:12px">Your referral link</h3>
+          <div class="copybox">
+            <code data-reflink>sign in to see your link</code>
+            <button class="btn btn--sm btn--ghost" data-refcopy data-copy="">Copy</button>
+          </div>
+          <p class="small muted" style="margin-top:12px">
+            The referral is attributed for 90 days from first visit and survives sign-up.
+          </p>
+        </div>
+
+        <div class="card" style="margin-top:18px" id="exchanges">
+          <h3 style="margin-bottom:14px">Affiliate exchanges</h3>
+          <div class="table-wrap" style="box-shadow:none">
+            <table class="tbl">
+              <thead><tr><th>Date</th><th>Referral</th><th>Volume</th><th>Rate</th><th>Your reward</th></tr></thead>
+              <tbody data-aff-rows>
+                <tr><td colspan="5" class="center muted" style="padding:22px">Loading&hellip;</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:18px" id="withdraw">
+          <h3 style="margin-bottom:16px">Affiliate money withdrawal</h3>
+          <form class="form" data-form="affwithdraw" novalidate>
+            <div class="form__field">
+              <label>Payment system <i>*</i></label>
+              <select class="select" name="system" data-cur-options></select>
+            </div>
+            <div class="form__field">
+              <label>Account number <i>*</i></label>
+              <input class="input" name="account" data-rule="required" autocomplete="off">
+            </div>
+            <div class="form__field">
+              <label>Amount <i>*</i></label>
+              <input class="input" name="amount" inputmode="decimal" data-rule="required" placeholder="0.00">
+            </div>
+            <div class="form__field">
+              <label>PIN code</label>
+              <input class="input" name="pin" inputmode="numeric" autocomplete="off"
+                     placeholder="required if you set one">
+            </div>
+            <div class="form__field">
+              <label>Captcha <i>*</i></label>
+              <div class="captcha">
+                <span class="captcha__img"></span>
+                <button type="button" class="captcha__reload" title="New code">&#8635;</button>
+                <input class="input" data-captcha-input placeholder="Enter the code" autocomplete="off">
+              </div>
+            </div>
+            <div><button class="btn" type="submit">Withdraw</button></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div data-shell-footer></div>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/forms.js"></script>
+</body>
+</html>

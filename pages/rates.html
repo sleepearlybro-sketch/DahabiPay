@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rates &amp; reserves - Dahabi Pay</title>
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<div data-shell-header></div>
+
+<main>
+  <div class="shell">
+
+    <section class="section" data-rates-scope>
+      <div class="section__head">
+        <div>
+          <h2>Rates &amp; reserves</h2>
+          <p class="muted small" data-rcount style="margin-top:6px"></p>
+        </div>
+        <a class="btn btn--ghost btn--sm" href="api.html">XML rates feed</a>
+      </div>
+
+      <div class="filters">
+        <input type="search" placeholder="Search a currency or pair..." data-rsearch>
+        <select data-rgroup>
+          <option value="">All send groups</option>
+          <option value="crypto">Cryptocurrencies</option>
+          <option value="account">Electronic accounts</option>
+          <option value="mobile">Mobile money &amp; local banking</option>
+        </select>
+      </div>
+
+      <div class="table-wrap" data-render="rates" data-limit="120">
+        <table class="tbl">
+          <thead><tr><th>You send</th><th>You get</th><th>Rate</th><th>Limits</th><th>Reserve</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section__head"><h2>Reserves</h2></div>
+      <div class="table-wrap" data-render="reserves">
+        <table class="tbl">
+          <thead><tr><th>Currency</th><th>Group</th><th>Reserve</th><th>Value</th><th>Depth</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="small muted" style="margin-top:12px">
+        Reserves refresh automatically after every completed order. Amounts above the
+        published reserve can still be arranged - contact an operator before paying.
+      </p>
+    </section>
+
+  </div>
+</main>
+
+<div data-shell-footer></div>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/exchanger.js"></script>
+</body>
+</html>

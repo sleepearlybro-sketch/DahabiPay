@@ -1,0 +1,29 @@
+{
+  "name": "dahabi-pay",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dahabi Pay - exchanger front-end, API and operator panel",
+  "type": "module",
+  "engines": {
+    "node": ">=22.5"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env --no-warnings server/index.js",
+    "dev": "node --env-file-if-exists=.env --no-warnings --watch server/index.js",
+    "seed": "node --env-file-if-exists=.env --no-warnings server/seed.js",
+    "reset": "node --env-file-if-exists=.env --no-warnings server/seed.js --reset",
+    "test": "node --test --no-warnings \"server/test/*.test.js\"",
+    "test:e2e": "node --env-file=.env --no-warnings server/test/e2e.mjs",
+    "test:account": "node --env-file=.env --no-warnings server/test/account.mjs",
+    "test:webhook": "node --env-file=.env --no-warnings server/test/webhook.mjs",
+    "backup": "bash deploy/backup.sh"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "railway": "^3.11.0"
+  }
+}

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Security - Dahabi Pay</title>
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<div data-shell-header></div>
+
+<main>
+  <div class="shell">
+    <div class="dash">
+      <div data-shell-side></div>
+
+      <div data-security>
+        <div class="section__head" style="margin-top:0">
+          <h2>Security</h2>
+          <a class="btn btn--sm btn--ghost" href="profile.html">Back to profile</a>
+        </div>
+
+        <!-- email confirmation ------------------------------------------- -->
+        <div class="card" style="margin-bottom:18px">
+          <h3 style="margin-bottom:14px">Email address</h3>
+          <div class="kv" data-email-state>
+            <div><span>Loading</span><b>&hellip;</b></div>
+          </div>
+          <p style="margin-top:16px" data-resend-wrap hidden>
+            <button class="btn btn--sm btn--ghost" data-resend>Send a new confirmation link</button>
+          </p>
+        </div>
+
+        <!-- password ----------------------------------------------------- -->
+        <div class="card" style="margin-bottom:18px">
+          <h3 style="margin-bottom:6px">Change password</h3>
+          <p class="muted small" style="margin-bottom:18px">
+            Changing it signs out every other device. This one stays signed in.
+          </p>
+          <form class="form" data-form="password" novalidate>
+            <div class="form__field">
+              <label>Current password <i>*</i></label>
+              <input class="input" name="current" type="password" data-rule="required"
+                     autocomplete="current-password">
+            </div>
+            <div class="form__field">
+              <label>New password <i>*</i></label>
+              <input class="input" name="password" id="newpw" type="password"
+                     data-rule="required pass" autocomplete="new-password">
+              <span class="hint">At least 8 characters.</span>
+            </div>
+            <div class="form__field">
+              <label>Confirm new password <i>*</i></label>
+              <input class="input" name="password2" type="password"
+                     data-rule="required" data-match="#newpw" autocomplete="new-password">
+            </div>
+            <div><button class="btn" type="submit">Change password</button></div>
+          </form>
+        </div>
+
+        <!-- PIN ---------------------------------------------------------- -->
+        <div class="card" style="margin-bottom:18px">
+          <h3 style="margin-bottom:6px">Personal PIN code</h3>
+          <p class="muted small" style="margin-bottom:18px">
+            A PIN is asked for at sign-in and before any withdrawal. It is a second
+            thing an attacker needs even if they have your password.
+            <b data-pin-state></b>
+          </p>
+          <form class="form" data-form="pin" novalidate>
+            <div class="form__field">
+              <label>Account password <i>*</i></label>
+              <input class="input" name="password" type="password" data-rule="required"
+                     autocomplete="current-password">
+              <span class="hint">Required to change the PIN, even though you are signed in.</span>
+            </div>
+            <div class="form__field">
+              <label>New PIN</label>
+              <input class="input" name="pin" inputmode="numeric" data-rule="pin"
+                     placeholder="4-6 digits" autocomplete="off">
+              <span class="hint">Leave blank and submit to remove the PIN entirely.</span>
+            </div>
+            <div><button class="btn" type="submit">Save PIN</button></div>
+          </form>
+        </div>
+
+        <!-- sessions ----------------------------------------------------- -->
+        <div class="card">
+          <div class="section__head" style="margin-bottom:14px">
+            <h3 style="margin:0">Active sessions</h3>
+            <button class="btn btn--sm btn--danger" data-revoke-others>Sign out other devices</button>
+          </div>
+          <div class="table-wrap" style="box-shadow:none">
+            <table class="tbl" style="min-width:520px">
+              <thead><tr><th>Device</th><th>IP</th><th>Started</th><th>Expires</th></tr></thead>
+              <tbody data-sessions>
+                <tr><td colspan="4" class="center muted" style="padding:22px">Loading&hellip;</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div data-shell-footer></div>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/forms.js"></script>
+</body>
+</html>

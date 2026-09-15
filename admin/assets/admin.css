@@ -1,0 +1,150 @@
+/* ==========================================================================
+   Operator panel layout. Inherits every token from the product's app.css,
+   so the back office looks like the same system rather than a bolted-on
+   tool - and a palette change in one place re-skins both.
+   ========================================================================== */
+
+.adm{background:var(--page);min-height:100vh;display:flex;flex-direction:column}
+
+/* ------------------------------------------------------------------- top */
+.adm__top{
+  position:sticky;top:0;z-index:60;
+  background:var(--navy-900);color:#fff;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:10px 20px;
+}
+.adm__top a{color:#fff}
+.adm__top .btn{color:var(--btn-fg)}
+.adm__top-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.adm__who{font-size:13px;font-weight:700;opacity:.9}
+.adm__env{
+  font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  padding:4px 9px;border-radius:var(--r-pill);background:rgba(255,255,255,.16);
+}
+.adm__env[data-prod]{background:var(--danger)}
+
+/* ------------------------------------------------------------------ body */
+.adm__body{flex:1 0 auto;display:grid;grid-template-columns:218px minmax(0,1fr);gap:0;align-items:start}
+
+.adm__nav{
+  position:sticky;top:58px;padding:16px 12px;display:grid;gap:2px;
+  /* without align-content the grid rows stretch to fill the full height */
+  align-content:start;
+  background:#fff;min-height:calc(100vh - 58px);border-right:1px solid var(--line-2);
+}
+.adm__nav a{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:10px 12px;border-radius:var(--r-sm);
+  font-size:13.5px;font-weight:700;color:var(--ink-2);
+}
+.adm__nav a:hover{background:var(--card-alt);color:var(--navy);text-decoration:none}
+.adm__nav a.is-active{background:var(--navy);color:#fff}
+.adm__nav b{
+  min-width:20px;padding:1px 6px;border-radius:var(--r-pill);
+  background:var(--danger);color:#fff;font-size:11px;text-align:center;
+}
+.adm__nav b:empty{display:none}
+
+.adm__view{padding:22px;min-width:0}
+.adm__loading{padding:40px;text-align:center;color:var(--muted-2);font-weight:700}
+
+/* ---------------------------------------------------------------- pieces */
+.adm__head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.adm__head h2{font-size:26px}
+.adm__head p{margin:6px 0 0;font-size:13px;color:var(--muted)}
+
+.adm__alert{
+  display:flex;gap:10px;align-items:flex-start;
+  padding:13px 16px;border-radius:var(--r-sm);margin-bottom:12px;
+  font-size:13.5px;font-weight:600;
+}
+.adm__alert--warn{background:rgba(224,147,15,.14);color:#7a4f03}
+.adm__alert--err{background:rgba(217,50,50,.1);color:#a32020}
+.adm__alert--ok{background:rgba(95,175,18,.14);color:#3d700b}
+.adm__alert b{display:block;font-family:var(--ff-head);font-size:13px;margin-bottom:2px}
+
+.adm__cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px;margin-bottom:18px}
+
+.adm__panel{background:#fff;border-radius:var(--r-md);box-shadow:var(--sh-card);padding:18px;margin-bottom:16px}
+.adm__panel h3{font-size:16px;margin-bottom:14px}
+
+/* dense table variant for the back office */
+.tbl--dense th,.tbl--dense td{padding:9px 12px;font-size:13px}
+.tbl--dense{min-width:760px}
+.tbl code{font-size:12px}
+
+.adm__filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.adm__filters input,.adm__filters select{
+  min-height:38px;padding:0 11px;border:1.5px solid var(--line-2);border-radius:var(--r-sm);
+  background:#fff;font:600 13px var(--ff-body);color:var(--ink-2);outline:none;
+}
+.adm__filters input:focus,.adm__filters select:focus{border-color:var(--navy)}
+.adm__filters input[type=search]{flex:1 1 220px}
+.adm__count{font-size:12.5px;color:var(--muted-2);font-weight:700;margin-left:auto}
+
+.adm__actions{display:flex;gap:7px;flex-wrap:wrap}
+.adm__actions .btn{min-height:32px;padding:0 12px;font-size:12.5px}
+
+/* order detail */
+.adm__split{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(280px,.6fr);gap:16px;align-items:start}
+
+.timeline{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.timeline li{
+  position:relative;padding:0 0 16px 22px;border-left:2px solid var(--line-2);
+  font-size:13px;color:var(--ink-2);
+}
+.timeline li:last-child{border-left-color:transparent;padding-bottom:0}
+.timeline li::before{
+  content:'';position:absolute;left:-6px;top:3px;width:10px;height:10px;border-radius:50%;
+  background:var(--navy);
+}
+.timeline li b{display:block;font-size:13px}
+.timeline li span{display:block;font-size:11.5px;color:var(--muted-2);margin-top:1px}
+.timeline li em{font-style:normal;color:var(--muted)}
+
+.adm__inline{display:flex;gap:6px;align-items:center}
+.adm__inline input,.adm__inline select{
+  min-height:32px;padding:0 9px;border:1.5px solid var(--line-2);border-radius:8px;
+  font:600 12.5px var(--ff-body);width:100%;min-width:0;outline:none;
+}
+.adm__inline input:focus{border-color:var(--navy)}
+.adm__inline input.is-dirty{border-color:var(--warn);background:#fffdf6}
+
+.adm__matrix{border-collapse:collapse}
+.adm__matrix th,.adm__matrix td{border:1px solid var(--line-2);padding:11px 14px;text-align:center;font-size:13px}
+.adm__matrix th{background:var(--card-alt);font-weight:800;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted-2)}
+.adm__matrix td button{
+  border:0;background:transparent;cursor:pointer;font-size:18px;line-height:1;padding:2px 6px;border-radius:6px;
+}
+.adm__matrix td button:hover{background:var(--card-alt)}
+
+pre.adm__json{
+  background:#04283f;color:#d7e7f5;border-radius:var(--r-sm);padding:12px;
+  overflow:auto;max-height:300px;font:500 12px/1.55 ui-monospace,Consolas,monospace;margin:0;
+}
+
+/* ----------------------------------------------------------------- modal */
+.adm__modal{position:fixed;inset:0;z-index:300;display:grid;place-items:center}
+.adm__modal-veil{position:absolute;inset:0;background:rgba(0,32,54,.55)}
+.adm__modal-box{
+  position:relative;background:#fff;border-radius:var(--r-md);padding:22px;
+  width:min(460px,92vw);box-shadow:var(--sh-pop);display:grid;gap:14px;
+}
+.adm__modal-box h3{font-size:19px}
+.adm__modal-box code{background:var(--field);padding:2px 7px;border-radius:5px;font-weight:700}
+.adm__modal-actions{display:flex;justify-content:flex-end;gap:8px}
+
+/* ------------------------------------------------------------ responsive */
+@media (max-width:1000px){
+  .adm__body{grid-template-columns:1fr}
+  .adm__nav{
+    position:static;min-height:0;border-right:0;border-bottom:1px solid var(--line-2);
+    grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  }
+  .adm__split{grid-template-columns:1fr}
+}
+@media (max-width:600px){
+  .adm__top{padding:10px 14px}
+  .adm__who,.adm__env{display:none}
+  .adm__view{padding:14px}
+}

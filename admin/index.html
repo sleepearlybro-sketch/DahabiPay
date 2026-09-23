@@ -1,73 +1,9 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Operator panel - Dahabi Pay</title>
-<meta name="robots" content="noindex,nofollow">
-<link rel="stylesheet" href="/assets/css/app.css">
-<link rel="stylesheet" href="assets/admin.css">
-</head>
-<body class="adm">
-
-<header class="adm__top">
-  <a class="logo" href="#/">
-    <span class="logo__mark">D</span>
-    <span><span class="logo__text">Dahabi <em>Pay</em></span>
-    <span class="logo__sub">operator panel</span></span>
-  </a>
-  <div class="adm__top-right">
-    <span class="adm__env" data-env></span>
-    <span class="adm__who" data-who></span>
-    <a class="btn btn--sm btn--light" href="/" target="_blank" rel="noopener">View site</a>
-    <button class="btn btn--sm btn--ghost" style="--btn-bd:rgba(255,255,255,.5);--btn-fg:#fff" data-signout>Sign out</button>
-  </div>
-</header>
-
-<div class="adm__body">
-  <nav class="adm__nav" data-nav hidden>
-    <a href="#/">Dashboard <b data-badge="attention"></b></a>
-    <a href="#/orders">Orders</a>
-    <a href="#/currencies">Currencies &amp; rates</a>
-    <a href="#/directions">Directions</a>
-    <a href="#/users">Users</a>
-    <a href="#/kyc">KYC <b data-badge="kyc"></b></a>
-    <a href="#/withdrawals">Withdrawals <b data-badge="withdrawals"></b></a>
-    <a href="#/reviews">Reviews <b data-badge="reviews"></b></a>
-    <a href="#/rates">Rate feed</a>
-    <a href="#/audit">Audit log</a>
-    <a href="#/settings">Settings</a>
-  </nav>
-
-  <main class="adm__view" data-view>
-    <div class="adm__loading">Loading…</div>
-  </main>
-</div>
-
-<!-- confirmation dialog for anything that moves money -->
-<div class="adm__modal" data-modal hidden>
-  <div class="adm__modal-veil" data-modal-cancel></div>
-  <div class="adm__modal-box">
-    <h3 data-modal-title>Confirm</h3>
-    <p class="muted small" data-modal-body></p>
-    <div data-modal-fields></div>
-    <div class="form__field" data-modal-reason-wrap>
-      <label>Reason <i>*</i></label>
-      <input class="input" data-modal-reason placeholder="Recorded in the audit log">
-    </div>
-    <div class="form__field" data-modal-confirm-wrap hidden>
-      <label>Type <code data-modal-word></code> to confirm</label>
-      <input class="input" data-modal-confirm autocomplete="off">
-    </div>
-    <div class="adm__modal-actions">
-      <button class="btn btn--ghost btn--sm" data-modal-cancel>Cancel</button>
-      <button class="btn btn--sm" data-modal-ok>Confirm</button>
-    </div>
-  </div>
-</div>
-
-<div class="toasts"></div>
-
-<script src="assets/admin.js" type="module"></script>
-</body>
-</html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dahabi Pay Operations</title><link rel="stylesheet" href="/admin/assets/admin.css"><script type="module" src="/admin/assets/admin.js"></script></head><body>
+<section class="login" id="login"><form class="login__card" id="loginForm"><a class="brand" href="/"><b>D</b>Dahabi Pay</a><h1>Staff sign in</h1><p>Use your authorized staff email. We will send a six-digit code.</p><label>Email<input id="loginEmail" type="email" autocomplete="email" required></label><label id="codeField" class="hidden">Verification code<input id="loginCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label><p class="error" id="loginError"></p><button id="loginButton">Send sign-in code</button></form></section>
+<div class="app hidden" id="app"><aside><a class="brand" href="/"><b>D</b>Dahabi Pay</a><nav><button class="active" data-view="dashboard">Overview</button><button data-view="requests">Requests</button><button data-view="settings">Settings</button></nav><div class="staff"><strong id="staffName"></strong><small id="staffRole"></small><button id="logout">Sign out</button></div></aside><main><header><div><h1 id="pageTitle">Overview</h1><p id="pageHint">Live manual exchange operations</p></div><span class="live">● Live</span></header>
+<section id="dashboardView"><div class="stats"><article><span>Awaiting contact</span><b id="verifiedCount">0</b></article><article><span>Contacted</span><b id="contactedCount">0</b></article><article><span>Active exchanges</span><b id="activeCount">0</b></article><article><span>Completed</span><b id="completedCount">0</b></article></div><div class="panel"><h2>Recent requests</h2><div id="recent"></div></div></section>
+<section id="requestsView" class="hidden"><div class="panel"><div class="filters"><input id="search" placeholder="Reference, customer, email or WhatsApp"><select id="statusFilter"><option value="">All statuses</option><option value="verified">Verified</option><option value="contacted">Contacted</option><option value="in_progress">In progress</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select><input id="fromDate" type="date"><input id="toDate" type="date"><button id="filterBtn">Search</button></div><div id="requestList"></div></div></section>
+<section id="settingsView" class="hidden"><form class="panel form" id="settingsForm"><h2>Exchange settings</h2><div class="row"><label>Customer rate<input id="settingRate" inputmode="decimal" required></label><label>Minimum USDT<input id="settingMin" inputmode="decimal" required></label><label>Maximum USDT<input id="settingMax" inputmode="decimal" required></label></div><label>Operations notification email<input id="settingEmail" type="email"></label><label>WhatsApp message template<textarea id="settingMessage" required></textarea><small>Available: {{name}}, {{reference}}, {{send}}, {{receive}}</small></label><label class="switch"><input id="settingEnabled" type="checkbox"> Accept new exchange requests</label><p class="error" id="settingsError"></p><button>Save settings</button></form></section>
+</main></div>
+<dialog id="detailDialog"><div class="dialog__head"><div><h2 id="detailRef"></h2><span class="badge" id="detailStatus"></span></div><button id="closeDetail" aria-label="Close">×</button></div><div id="detailBody"></div></dialog>
+</body></html>

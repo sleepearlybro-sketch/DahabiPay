@@ -1,103 +1,16 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dahabi Pay - Electronic currencies exchanger</title>
-<meta name="description" content="Safe, easy, instant exchange between cryptocurrencies, electronic accounts and mobile money. 24/7 automated transactions.">
-<link rel="stylesheet" href="assets/css/app.css">
-</head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="Request a manual USDT TRC20 to Money Go USD exchange with Dahabi Pay."><title>Dahabi Pay · USDT to Money Go USD</title><link rel="stylesheet" href="/assets/css/app.css"><script type="module" src="/assets/js/manual.js"></script></head>
 <body>
-
-<div data-shell-header></div>
-
-<main>
-  <div class="shell">
-
-    <!-- ------------------------------------------------------------ hero -->
-    <section class="hero">
-      <div class="hero__copy">
-        <span class="pill">24/7 exchange</span>
-        <h1>Safe, easy,<br>instant</h1>
-        <p class="hero__lead">
-          Move value between crypto, electronic accounts and mobile money in
-          minutes. Rates are quoted live, orders are processed automatically,
-          and an operator is on hand around the clock.
-        </p>
-        <div class="hero__stats">
-          <div class="hero__stat"><b>23</b><span>currencies &amp; rails</span></div>
-          <div class="hero__stat"><b>5-15 min</b><span>typical settlement</span></div>
-          <div class="hero__stat"><b>24/7</b><span>automated payouts</span></div>
-        </div>
-      </div>
-      <div data-exchanger></div>
-    </section>
-
-    <!-- ----------------------------------------------------------- steps -->
-    <section class="section">
-      <div class="steps" data-render="steps"></div>
-    </section>
-
-    <!-- ------------------------------------------------------ advantages -->
-    <section class="section adv">
-      <div>
-        <h2>Why Choose<span>Dahabi Pay?</span></h2>
-        <p class="adv__lead">
-          Exchange becomes easier when your convenience is taken care of in advance.
-        </p>
-        <p style="margin-top:20px">
-          <a class="btn btn--ghost" href="pages/about.html">About the service</a>
-        </p>
-      </div>
-      <ul class="adv__list" data-render="advantages"></ul>
-    </section>
-
-    <!-- ------------------------------------------------- rates shortcuts -->
-    <section class="section">
-      <div class="section__head">
-        <h2>Popular directions</h2>
-        <a href="pages/rates.html">All rates &amp; reserves &#8594;</a>
-      </div>
-      <div class="table-wrap" data-render="rates" data-limit="8">
-        <table class="tbl">
-          <thead><tr><th>You send</th><th>You get</th><th>Rate</th><th>Limits</th><th>Reserve</th><th></th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- --------------------------------------------------------- reviews -->
-    <section class="section">
-      <div class="section__head">
-        <h2>Reviews</h2>
-        <a href="pages/reviews.html">All reviews &#8594;</a>
-      </div>
-      <div class="reviews" data-render="reviews" data-limit="6"></div>
-    </section>
-
-    <!-- ------------------------------------------------------------ news -->
-    <section class="section">
-      <div class="section__head">
-        <h2>News</h2>
-        <a href="pages/news.html">All news &#8594;</a>
-      </div>
-      <div class="news" data-render="news" data-limit="3"></div>
-    </section>
-
-    <!-- -------------------------------------------------------- partners -->
-    <section class="section">
-      <div class="section__head"><h2>Partners</h2></div>
-      <div class="partners" data-render="partners"></div>
-    </section>
-
-  </div>
-</main>
-
-<div data-shell-footer></div>
-
-<script src="assets/js/data.js"></script>
-<script src="assets/js/api.js"></script>
-<script src="assets/js/app.js"></script>
-<script src="assets/js/exchanger.js"></script>
-</body>
-</html>
+<header class="top"><nav class="nav"><a class="brand" href="/"><span class="brand__mark">D</span>Dahabi Pay</a><div class="nav__links"><a href="#how">How it works</a><a href="#faq">FAQ</a><a href="mailto:support@dahabipay.com">Contact</a></div></nav>
+<div class="hero"><div class="hero__intro"><div class="eyebrow">Manual exchange service</div><h1>USDT to Money Go, made simple.</h1><p class="hero__copy">Submit a verified exchange request in minutes. Our team confirms the details and contacts you on WhatsApp to complete it manually.</p><div class="trust"><span>Email verified</span><span>Clear rate</span><span>Human support</span></div></div>
+<main class="exchange" id="exchange" aria-live="polite">
+<div class="steps" aria-label="Progress"><i class="on"></i><i></i><i></i><i></i></div>
+<section data-step="1"><h2>Get your quote</h2><p class="muted" id="availability">Loading the current offer…</p><div class="pair"><div class="asset"><span class="coin">₮</span><div><strong>You send</strong><small>Tether USDT · TRC20</small></div></div></div><div class="field"><label for="amount">Amount</label><div class="input-wrap"><input id="amount" inputmode="decimal" autocomplete="off" placeholder="0.00"><span class="suffix">USDT</span></div></div><div class="pair"><div class="asset"><span class="coin money">$</span><div><strong>You receive</strong><small>Money Go · USD</small></div></div><strong id="receive">$0.00</strong></div><div class="quote"><span>Rate</span><b id="rate">—</b><span>Limits</span><b id="limits">—</b></div><p class="notice">This is a manual request. No cryptocurrency is sent through this website. Our team will contact you before the exchange proceeds.</p><p class="error" role="alert"></p><button class="btn" id="quoteBtn" disabled>Continue</button></section>
+<section data-step="2" class="hidden"><h2>Your details</h2><p class="muted">We use these details only to verify and process this request.</p><div class="field"><label for="fullName">Full name</label><input id="fullName" autocomplete="name"></div><div class="field"><label for="email">Email</label><input id="email" type="email" inputmode="email" autocomplete="email"></div><div class="field"><label for="whatsapp">WhatsApp number</label><input id="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="+254712345678"></div><div class="field"><label for="moneygoAccount">Money Go account</label><input id="moneygoAccount" autocomplete="off" maxlength="64"></div><div class="field"><label for="note">Note <span class="muted">(optional)</span></label><textarea id="note" maxlength="1000"></textarea></div><p class="error" role="alert"></p><div class="actions"><button class="btn btn--secondary" data-back="1">Back</button><button class="btn" id="otpBtn">Email verification code</button></div></section>
+<section data-step="3" class="hidden"><h2>Verify your email</h2><p class="muted">Enter the six-digit code sent to <strong id="otpEmail"></strong>. The code may take a minute to arrive.</p><div class="field"><label for="otp">Verification code</label><input class="otp" id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]*"></div><p class="error" role="alert"></p><button class="btn" id="verifyBtn">Verify and submit request</button><div class="actions"><button class="btn btn--secondary" data-back="2">Change details</button><button class="btn btn--secondary" id="resendBtn" disabled>Resend in 60s</button></div></section>
+<section data-step="4" class="hidden success"><div class="success__icon">✓</div><h2>Request received</h2><p>Your email is verified. Our team will contact you on WhatsApp shortly.</p><div class="reference" id="reference"></div><p class="muted" id="confirmedQuote"></p><button class="btn" id="newBtn">Create another request</button></section>
+</main></div></header>
+<section class="section" id="how"><h2>How it works</h2><p>A clear, verified request followed by personal service.</p><div class="grid3"><article class="info"><span class="info__num">1</span><h3>Review your quote</h3><p>Enter USDT and see the exact Money Go USD amount at our current customer rate.</p></article><article class="info"><span class="info__num">2</span><h3>Verify your email</h3><p>Provide your details and confirm the six-digit code delivered to your inbox.</p></article><article class="info"><span class="info__num">3</span><h3>Complete on WhatsApp</h3><p>A Dahabi Pay team member contacts you and manually completes the exchange.</p></article></div></section>
+<section class="section faq" id="faq"><h2>Frequently asked questions</h2><p>What to expect from this manual service.</p><details><summary>Does the website receive my USDT?</summary><p>No. The site records a verified request only. Staff provide the next steps directly on WhatsApp.</p></details><details><summary>Is the displayed rate guaranteed?</summary><p>Your quote is locked for 15 minutes. Submit before it expires; otherwise, review a fresh quote.</p></details><details><summary>Which exchange pair is supported?</summary><p>Only Tether USDT on the TRC20 network to Money Go USD.</p></details><details><summary>How quickly will the team contact me?</summary><p>During operating hours, staff review verified requests as soon as possible. A request is not a guarantee of completion.</p></details></section>
+<footer class="footer"><div class="footer__in"><span>© 2026 Dahabi Pay · Manual exchange requests</span><span><a href="/privacy">Privacy</a><a href="/agreement">Terms</a><a href="/admin/">Staff</a></span></div></footer>
+</body></html>

@@ -1,204 +1,71 @@
-/* ==========================================================================
-   Dahabi Pay server.
-
-   Serves the static front-end and the API from one origin, so the browser
-   needs no CORS and session cookies are first-party.
-   ========================================================================== */
-
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import path from 'node:path';
+import { config, configWarnings, assertRuntimeConfig, ROOT } from './config.js';
+import { attachStaff } from './lib/staff.js';
+import publicRoutes from './routes/manual-public.js';
+import adminRoutes from './routes/manual-admin.js';
+import * as store from './store.js';
+import { startNotifications, stopNotifications } from './services/notifications.js';
 
-import { config, configWarnings, ROOT } from './config.js';
-import * as db from './db.js';
-import { attachUser, pruneSessions, requireRole, clientIp } from './lib/auth.js';
-import { HttpError, auditSystem } from './lib/http.js';
-import * as O from './lib/orders.js';
-import * as rates from './services/rates.js';
-
-import publicRoutes from './routes/public.js';
-import authRoutes from './routes/auth.js';
-import orderRoutes from './routes/orders.js';
-import accountRoutes from './routes/account.js';
-import adminRoutes from './routes/admin.js';
-import webhookRoutes from './routes/webhooks.js';
-
-await db.migrate();
-
+assertRuntimeConfig();
 const app = express();
 app.disable('x-powered-by');
-// behind a reverse proxy in production, so req.ip honours X-Forwarded-For
 app.set('trust proxy', config.env === 'production' ? 1 : false);
-
-/* ------------------------------------------------------------- middleware */
 app.use((_req, res, next) => {
   res.set({
     'x-content-type-options': 'nosniff',
     'referrer-policy': 'strict-origin-when-cross-origin',
-    'x-frame-options': 'SAMEORIGIN'
+    'x-frame-options': 'DENY',
+    'permissions-policy': 'camera=(), microphone=(), geolocation=()',
+    'content-security-policy': "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
   });
+  if (_req.path.startsWith('/api/')) res.set('cache-control', 'no-store');
   next();
 });
-
-// Webhooks need the unparsed body to verify their HMAC, so they mount before
-// the JSON parser.
-app.use('/api/webhooks', webhookRoutes);
-
 app.use(express.json({ limit: config.limits.jsonBody }));
-app.use(express.urlencoded({ extended: false, limit: config.limits.jsonBody }));
 app.use(cookieParser());
-app.use(attachUser);
+app.use(attachStaff);
 
-/* ----------------------------------------------------------------- routes */
+app.get('/api/health', async (_req, res) => {
+  try {
+    const settings = await store.getSettings();
+    res.json({ ok: true, database: 'supabase-postgresql', acceptingRequests: Boolean(settings.accepting_requests), time: new Date().toISOString() });
+  } catch { res.status(503).json({ ok: false, database: 'unavailable' }); }
+});
 app.use('/api', publicRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/account', accountRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/admin', express.static(path.join(ROOT, 'admin'), { index: 'index.html' }));
 
-/* -------------------------------------------------------------- cron jobs
-   The in-process poller already runs these; the endpoints exist so an
-   external scheduler can drive them too (or take over entirely with
-   RATES_REFRESH_SEC=0).                                                   */
-function cronAuth(req, res, next) {
-  if (!config.cronSecret) return res.status(503).json({ error: 'CRON_SECRET is not set' });
-  const sent = String(req.get('x-cron-secret') || req.query.secret || '');
-  if (sent !== config.cronSecret) return res.status(401).json({ error: 'Bad cron secret' });
-  next();
-}
-
-app.post('/api/cron/rates', cronAuth, async (_req, res) => {
-  const out = await rates.refresh();
-  res.json(out);
-});
-
-app.post('/api/cron/expire', cronAuth, async (_req, res, next) => {
-  let n;
-  try { n = await O.expireStale(); } catch (err) { return next(err); }
-  res.json({ expired: n });
-});
-
-/* ----------------------------------------------------------- admin panel
-   The shell is served to anyone: it carries no data, and every figure in it
-   comes from /api/admin/* which requireRole('operator') guards. Gating the
-   HTML too would only mean a browser rendering a raw 401 on direct
-   navigation, so the panel renders its own sign-in card instead.          */
-app.use('/admin', express.static(path.join(ROOT, 'admin')));
-
-/* ---------------------------------------------------------- static files
-   The deny list MUST be registered before express.static, or static wins the
-   race and serves these anyway. That mattered: data/kyc holds uploaded
-   identity documents under predictable filenames.                        */
-const NEVER_SERVE = [
-  /^\/data(\/|$)/,          // the database and uploaded KYC documents
-  /^\/server(\/|$)/,        // source, including schema.sql
-  /^\/deploy(\/|$)/,        // deployment configs
-  /^\/node_modules(\/|$)/,
-  /^\/backups?(\/|$)/,
-  /(^|\/)\.env/,            // .env, .env.local, nested copies
-  /(^|\/)\.git(\/|$)/,
-  /^\/(Dockerfile|docker-compose\.ya?ml|package-lock\.json)$/i
-];
-
+const NEVER_SERVE = [/^\/data(\/|$)/, /^\/server(\/|$)/, /^\/supabase(\/|$)/, /^\/deploy(\/|$)/,
+  /^\/node_modules(\/|$)/, /(^|\/)\.env/, /(^|\/)\.git(\/|$)/,
+  /^\/(Dockerfile|docker-compose\.ya?ml|package(-lock)?\.json)$/i];
 app.use((req, res, next) => {
-  // decode first: %2e%2e and %2F would otherwise slip past the patterns
-  let path;
-  try { path = decodeURIComponent(req.path); } catch { path = req.path; }
-  if (NEVER_SERVE.some((re) => re.test(path))) {
-    return res.status(404).json({ error: 'Not found' });
-  }
+  let value;
+  try { value = decodeURIComponent(req.path); } catch { value = req.path; }
+  if (NEVER_SERVE.some((re) => re.test(value))) return res.status(404).json({ error: 'Not found' });
   next();
 });
-
-app.use(express.static(ROOT, {
-  index: 'index.html',
-  extensions: ['html'],
-  dotfiles: 'ignore',
-  setHeaders(res, filePath) {
-    if (/\.(css|js)$/.test(filePath)) res.set('cache-control', 'public, max-age=300');
-  }
-}));
-
-/* ------------------------------------------------------------- 404 + error */
-app.use((req, res) => {
-  if (req.path.startsWith('/api/')) return res.status(404).json({ error: 'Unknown endpoint' });
-  res.status(404).type('html').send(
-    `<!doctype html><meta charset="utf-8">
-     <meta name="viewport" content="width=device-width,initial-scale=1">
-     <title>Not found - Dahabi Pay</title>
-     <link rel="stylesheet" href="/assets/css/app.css">
-     <div class="shell"><div class="auth"><div class="card center">
-     <h2 class="card__title">Page not found</h2>
-     <p class="muted">That address does not exist.</p>
-     <p style="margin-top:18px"><a class="btn" href="/">Back to the exchanger</a></p>
-     </div></div></div>`
-  );
-});
-
-// eslint-disable-next-line no-unused-vars -- express identifies error handlers by arity
+app.use(express.static(ROOT, { index: 'index.html', extensions: ['html'], dotfiles: 'ignore' }));
+app.use((req, res) => req.path.startsWith('/api/')
+  ? res.status(404).json({ error: 'Unknown endpoint' })
+  : res.status(404).type('html').send('<!doctype html><meta charset="utf-8"><title>Not found · Dahabi Pay</title><main><h1>Page not found</h1><a href="/">Return home</a></main>'));
 app.use((err, req, res, _next) => {
-  const status = err instanceof HttpError ? err.status : (err.status || 500);
-
-  if (status >= 500) {
-    console.error('%s %s failed:', req.method, req.originalUrl, err);
-    auditSystem('server.error', {
-      entity: 'request',
-      detail: { method: req.method, url: req.originalUrl, message: err.message, ip: clientIp(req) }
-    }).catch((auditErr) => console.error('failed to write server audit:', auditErr));
-  }
-
-  res.status(status).json({
-    error: status >= 500 ? 'Something went wrong on our side.' : err.message,
-    field: err.field ?? undefined
-  });
+  const status = Number(err.status) || 500;
+  if (status >= 500) console.error(`${req.method} ${req.originalUrl}:`, err);
+  res.status(status).json({ error: status >= 500 ? 'Something went wrong on our side.' : err.message, field: err.field, code: err.code });
 });
 
-/* ------------------------------------------------------------------- boot */
 const server = app.listen(config.port, config.host, () => {
-  console.log('\nDahabi Pay');
-  console.log('  env:       %s', config.env);
-  console.log('  listening: http://%s:%d', config.host, config.port);
-  console.log('  admin:     http://%s:%d/admin/', config.host, config.port);
-  console.log('  database:  %s%s', db.engine, db.engine === 'sqlite' ? ` (${config.db.file})` : '');
-
-  const warn = configWarnings();
-  if (warn.length) {
-    console.log('\n  warnings:');
-    for (const w of warn) console.log('    ! %s', w);
-  }
-  console.log('');
-
-  rates.startPoller();
-
-  // expire stale quote locks, and tidy dead sessions
-  const sweep = setInterval(async () => {
-    try {
-      const n = await O.expireStale();
-      if (n) console.log('  expired %d stale order(s)', n);
-      await pruneSessions();
-    } catch (err) {
-      console.error('  sweep failed:', err.message);
-    }
-  }, 60_000);
-  sweep.unref();
+  console.log(`Dahabi Pay listening on http://${config.host}:${config.port}`);
+  for (const warning of configWarnings()) console.warn(`warning: ${warning}`);
+  startNotifications();
 });
-
-/* --------------------------------------------------------------- shutdown */
-let closing = false;
-for (const sig of ['SIGINT', 'SIGTERM']) {
-  process.on(sig, () => {
-    if (closing) return;
-    closing = true;
-    console.log('\n  %s received, shutting down', sig);
-    rates.stopPoller();
-    server.close(async () => { await db.close(); process.exit(0); });
-    // do not hang forever on a stuck connection
-    setTimeout(() => process.exit(0), 5000).unref();
-  });
-}
-
-process.on('unhandledRejection', (err) => {
-  console.error('unhandled rejection:', err);
+const sweep = setInterval(() => store.pruneStaffSessions().catch((error) => console.error('session cleanup:', error.message)), 60 * 60_000);
+sweep.unref();
+for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => {
+  stopNotifications(); clearInterval(sweep); server.close(() => process.exit(0));
+  setTimeout(() => process.exit(1), 5000).unref();
 });
 
 export default app;

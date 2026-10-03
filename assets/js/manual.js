@@ -1,3 +1,5 @@
+import { composeWhatsapp } from './phone.js';
+
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 const state = { offer: null, quoteToken: '', quote: null, step: 1, resendUntil: 0 };
@@ -25,7 +27,22 @@ function loading(button, active, label) {
   button.innerHTML = active ? '<span class="spinner"></span>' + label : button.dataset.label;
 }
 function contact() {
-  return { fullName: $('#fullName').value, email: $('#email').value, whatsapp: $('#whatsapp').value, moneygoAccount: $('#moneygoAccount').value, note: $('#note').value, quoteToken: state.quoteToken };
+  return { fullName: $('#fullName').value, email: $('#email').value, whatsapp: normalizedWhatsapp(), moneygoAccount: $('#moneygoAccount').value, note: $('#note').value, quoteToken: state.quoteToken };
+}
+function normalizedWhatsapp() {
+  return composeWhatsapp($('#whatsapp').value, $('#whatsappCountry').value, $('#customDialCode').value);
+}
+function updateWhatsappPreview() {
+  const raw = $('#whatsapp').value.trim();
+  const selected = $('#whatsappCountry').value;
+  const preview = normalizedWhatsapp();
+  $('#whatsappPreview').textContent = preview || (selected === 'other' ? 'Add country code' : $('#whatsappCountry').selectedOptions[0].textContent.split(' ').at(-1));
+  $('#whatsappPreview').classList.toggle('phone-preview--invalid', Boolean(raw && !/^\+[1-9]\d{7,14}$/.test(preview)));
+  $('#whatsappHelpText').textContent = /^\+|^00/.test(raw)
+    ? 'International number detected. We’ll use it as entered.'
+    : selected === 'other'
+      ? 'Enter the calling code above and your local number here.'
+      : 'Enter your number without the first 0 or country code.';
 }
 function renderEstimate() {
   const amount = Number($('#amount').value);
@@ -43,6 +60,15 @@ async function loadOffer() {
   } catch (e) { $('#availability').textContent = 'The current offer could not be loaded. Please try again shortly.'; error(e.message); }
 }
 $('#amount').addEventListener('input', renderEstimate);
+$('#whatsapp').addEventListener('input', updateWhatsappPreview);
+$('#whatsappCountry').addEventListener('change', () => {
+  $('#customDialWrap').classList.toggle('hidden', $('#whatsappCountry').value !== 'other');
+  const examples = { '+252': '61 168 0998', '+254': '712 345 678', '+251': '91 234 5678', '+253': '77 12 34 56', '+255': '712 345 678', '+256': '712 345 678', '+211': '912 345 678', '+249': '91 234 5678', '+967': '71 234 5678', '+971': '50 123 4567', '+966': '50 123 4567', '+974': '3312 3456', '+44': '7400 123456', '+1': '202 555 0123', '+47': '412 34 567', '+46': '70 123 45 67', '+31': '6 12345678', '+49': '1512 3456789', '+90': '532 123 45 67' };
+  $('#whatsapp').placeholder = examples[$('#whatsappCountry').value] || 'Enter local number';
+  updateWhatsappPreview();
+  if ($('#whatsappCountry').value === 'other') $('#customDialCode').focus();
+});
+$('#customDialCode').addEventListener('input', updateWhatsappPreview);
 $('#quoteBtn').addEventListener('click', async () => {
   error(); const button = $('#quoteBtn'); loading(button, true, 'Securing quote…');
   try {

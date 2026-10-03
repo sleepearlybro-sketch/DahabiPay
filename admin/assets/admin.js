@@ -8,10 +8,11 @@ async function api(path, options = {}) {
   return body;
 }
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-const date = (v) => v ? new Date(v).toLocaleString() : '—';
+const date = (v) => v ? new Date(v).toLocaleString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—';
 const money = (v, dp = 2) => Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: dp, maximumFractionDigits: dp });
 const label = (v) => ({ verified: 'Verified', contacted: 'Contacted', in_progress: 'In progress', completed: 'Completed', cancelled: 'Cancelled' })[v] || v;
 function badge(status) { return '<span class="badge" data-status="' + esc(status) + '">' + esc(label(status)) + '</span>'; }
+const initials = (value) => String(value || 'D').trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase();
 
 async function bootstrap() {
   try {
@@ -35,47 +36,90 @@ $('#loginForm').addEventListener('submit', async (event) => {
 async function enterApp() {
   $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
   $('#staffName').textContent = state.staff.displayName; $('#staffRole').textContent = state.staff.role;
-  if (state.staff.role !== 'admin') $('[data-view="settings"]').classList.add('hidden');
+  $('#welcomeName').textContent = (state.staff.displayName || 'team').split(' ')[0];
+  $('#staffAvatar').textContent = $('#topAvatar').textContent = initials(state.staff.displayName);
+  $('#todayLabel').textContent = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+  if (state.staff.role !== 'admin') {
+    $('[data-view="settings"]').classList.add('hidden');
+    $$('#noticeSettings, #offerManage, [data-open-settings]').forEach((button) => button.classList.add('hidden'));
+    $('.settings-lock').classList.add('hidden');
+  }
   await Promise.all([loadDashboard(), loadRequests(), loadSettings()]);
   startLive();
 }
 $('#logout').addEventListener('click', async () => { await api('/auth/logout', { method: 'POST' }).catch(() => {}); location.reload(); });
 $$('aside nav button').forEach((button) => button.addEventListener('click', () => setView(button.dataset.view)));
+$$('[data-open-requests]').forEach((button) => button.addEventListener('click', () => setView('requests')));
+$$('[data-open-settings]').forEach((button) => button.addEventListener('click', () => setView('settings')));
+$('#mobileMenu').addEventListener('click', () => $('#sidebar').classList.toggle('is-open'));
 function setView(view) {
   $$('aside nav button').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
   ['dashboard', 'requests', 'settings'].forEach((name) => $('#' + name + 'View').classList.toggle('hidden', name !== view));
-  $('#pageTitle').textContent = ({ dashboard: 'Overview', requests: 'Exchange requests', settings: 'Settings' })[view];
+  $('#crumbTitle').textContent = ({ dashboard: 'Overview', requests: 'Exchange requests', settings: 'Settings' })[view];
+  $('#sidebar').classList.remove('is-open');
+  if (view === 'requests') loadRequests();
 }
 async function loadDashboard() {
   const data = await api('/dashboard');
   $('#verifiedCount').textContent = data.counts.verified || 0; $('#contactedCount').textContent = data.counts.contacted || 0;
   $('#activeCount').textContent = data.counts.in_progress || 0; $('#completedCount').textContent = data.counts.completed || 0;
+  $('#pipelineVerified').textContent = data.counts.verified || 0; $('#pipelineContacted').textContent = data.counts.contacted || 0;
+  $('#pipelineProgress').textContent = data.counts.in_progress || 0; $('#pipelineCompleted').textContent = data.counts.completed || 0;
+  $('#navRequestCount').textContent = (data.counts.verified || 0) + (data.counts.contacted || 0) + (data.counts.in_progress || 0);
   renderTable($('#recent'), data.recent);
 }
 async function loadRequests() {
   const params = new URLSearchParams({ q: $('#search').value, status: $('#statusFilter').value, from: $('#fromDate').value, to: $('#toDate').value });
-  const data = await api('/requests?' + params); renderTable($('#requestList'), data.requests);
+  const data = await api('/requests?' + params); $('#requestTotal').textContent = data.total; renderTable($('#requestList'), data.requests);
 }
 function renderTable(target, rows) {
   if (!rows?.length) { target.innerHTML = '<div class="empty">No requests found.</div>'; return; }
-  target.innerHTML = '<div style="overflow:auto"><table class="table"><thead><tr><th>Reference</th><th>Customer</th><th>Amount</th><th>Status</th><th>Received</th></tr></thead><tbody>' +
-    rows.map((r) => '<tr data-id="' + esc(r.id) + '"><td><strong>' + esc(r.reference) + '</strong></td><td>' + esc(r.full_name) + '<br><small>' + esc(r.whatsapp) + '</small></td><td>' + money(r.send_usdt, 2) + ' USDT<br><small>' + money(r.receive_usd) + ' USD</small></td><td>' + badge(r.status) + '</td><td>' + esc(date(r.created_at)) + '</td></tr>').join('') +
-    '</tbody></table></div>';
+  target.innerHTML = '<table class="table"><thead><tr><th>REFERENCE</th><th>CUSTOMER</th><th>YOU SEND</th><th>THEY RECEIVE</th><th>STATUS</th><th>RECEIVED</th></tr></thead><tbody>' +
+    rows.map((r) => '<tr data-id="' + esc(r.id) + '"><td class="table__ref">' + esc(r.reference) + '</td><td><div class="table__customer"><span class="table__customer-avatar">' + esc(initials(r.full_name)) + '</span><span><strong>' + esc(r.full_name) + '</strong><small>' + esc(r.email) + '</small></span></div></td><td class="table__amount"><strong>' + money(r.send_usdt, 2) + ' USDT</strong><small>TRC20</small></td><td class="table__amount"><strong>' + money(r.receive_usd) + ' USD</strong><small>Money Go</small></td><td>' + badge(r.status) + '</td><td>' + esc(date(r.created_at)) + '</td></tr>').join('') +
+    '</tbody></table>';
   $$('tr[data-id]', target).forEach((row) => row.addEventListener('click', () => openDetail(row.dataset.id)));
 }
 $('#filterBtn').addEventListener('click', loadRequests);
 $('#search').addEventListener('keydown', (e) => { if (e.key === 'Enter') loadRequests(); });
+$('#globalSearch').addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && event.currentTarget.value.trim()) {
+    $('#search').value = event.currentTarget.value.trim(); event.currentTarget.value = ''; setView('requests');
+  }
+});
+$('.global-search').addEventListener('click', () => {
+  if (window.matchMedia('(max-width: 560px)').matches) {
+    $('.global-search').classList.add('is-open'); $('#globalSearch').focus();
+  }
+});
 async function loadSettings() {
   const data = await api('/settings'); state.settings = data.settings;
   $('#settingRate').value = data.settings.rate || ''; $('#settingMin').value = data.settings.min_usdt || ''; $('#settingMax').value = data.settings.max_usdt || '';
   $('#settingEmail').value = data.settings.operations_email || ''; $('#settingMessage').value = data.settings.whatsapp_template || ''; $('#settingEnabled').checked = data.settings.accepting_requests;
+  renderOffer(); renderServiceStatus();
+}
+function renderOffer() {
+  const settings = state.settings || {};
+  $('#offerRate').textContent = Number(settings.rate) > 0 ? money(settings.rate, 4) : 'Not set';
+  $('#offerMin').textContent = Number(settings.min_usdt) > 0 ? money(settings.min_usdt, 2) + ' USDT' : '—';
+  $('#offerMax').textContent = Number(settings.max_usdt) > 0 ? money(settings.max_usdt, 2) + ' USDT' : '—';
+}
+function renderServiceStatus() {
+  const settings = state.settings || {};
+  const configured = Number(settings.rate) > 0 && Number(settings.min_usdt) > 0 && Number(settings.max_usdt) >= Number(settings.min_usdt);
+  const enabled = Boolean(settings.accepting_requests && configured);
+  $('#sidebarServiceState').textContent = !configured ? 'Setup required' : enabled ? 'Accepting requests' : 'Requests paused';
+  $('#sidebarStatusHint').textContent = !configured ? 'Set a valid rate and amount range' : enabled ? 'Customers can submit requests' : 'Customers cannot submit requests';
+  $('#sidebarStatusDot').classList.toggle('is-on', enabled);
+  $('#serviceNotice').classList.toggle('hidden', enabled);
+  if (!configured) $('#serviceNoticeText').textContent = 'Set a customer rate and valid amount limits before enabling the service.';
+  else $('#serviceNoticeText').textContent = 'Customers can’t submit an exchange until the service is enabled.';
 }
 $('#settingsForm').addEventListener('submit', async (event) => {
   event.preventDefault(); $('#settingsError').textContent = '';
   const button = event.submitter; button.disabled = true;
   try {
     const result = await api('/settings', { method: 'PATCH', body: JSON.stringify({ rate: $('#settingRate').value, minUsdt: $('#settingMin').value, maxUsdt: $('#settingMax').value, operationsEmail: $('#settingEmail').value, whatsappTemplate: $('#settingMessage').value, acceptingRequests: $('#settingEnabled').checked }) });
-    state.settings = result.settings; $('#settingsError').style.color = '#3d7b00'; $('#settingsError').textContent = 'Settings saved.';
+    state.settings = result.settings; $('#settingsError').style.color = '#16834b'; $('#settingsError').textContent = 'Settings saved.'; renderOffer(); renderServiceStatus();
   } catch (e) { $('#settingsError').style.color = ''; $('#settingsError').textContent = e.message; }
   finally { button.disabled = false; }
 });
@@ -118,7 +162,7 @@ async function refreshAll() { await Promise.all([loadDashboard(), loadRequests()
 function startLive() {
   const events = new EventSource('/api/admin/events');
   events.addEventListener('request.created', refreshAll); events.addEventListener('request.updated', refreshAll);
-  events.addEventListener('settings.updated', loadSettings);
+  events.addEventListener('settings.updated', () => { loadSettings(); loadDashboard(); });
   state.poller = setInterval(refreshAll, 30000);
 }
 bootstrap();

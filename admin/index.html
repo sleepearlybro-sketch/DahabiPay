@@ -1,9 +1,128 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dahabi Pay Operations</title><link rel="stylesheet" href="/admin/assets/admin.css"><script type="module" src="/admin/assets/admin.js"></script></head><body>
-<section class="login" id="login"><form class="login__card" id="loginForm"><a class="brand" href="/"><b>D</b>Dahabi Pay</a><h1>Staff sign in</h1><p>Use your authorized staff email. We will send an eight-digit code.</p><label>Email<input id="loginEmail" type="email" autocomplete="email" required></label><label id="codeField" class="hidden">Verification code<input id="loginCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8"></label><p class="error" id="loginError"></p><button id="loginButton">Send sign-in code</button></form></section>
-<div class="app hidden" id="app"><aside><a class="brand" href="/"><b>D</b>Dahabi Pay</a><nav><button class="active" data-view="dashboard">Overview</button><button data-view="requests">Requests</button><button data-view="settings">Settings</button></nav><div class="staff"><strong id="staffName"></strong><small id="staffRole"></small><button id="logout">Sign out</button></div></aside><main><header><div><h1 id="pageTitle">Overview</h1><p id="pageHint">Live manual exchange operations</p></div><span class="live">● Live</span></header>
-<section id="dashboardView"><div class="stats"><article><span>Awaiting contact</span><b id="verifiedCount">0</b></article><article><span>Contacted</span><b id="contactedCount">0</b></article><article><span>Active exchanges</span><b id="activeCount">0</b></article><article><span>Completed</span><b id="completedCount">0</b></article></div><div class="panel"><h2>Recent requests</h2><div id="recent"></div></div></section>
-<section id="requestsView" class="hidden"><div class="panel"><div class="filters"><input id="search" placeholder="Reference, customer, email or WhatsApp"><select id="statusFilter"><option value="">All statuses</option><option value="verified">Verified</option><option value="contacted">Contacted</option><option value="in_progress">In progress</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select><input id="fromDate" type="date"><input id="toDate" type="date"><button id="filterBtn">Search</button></div><div id="requestList"></div></div></section>
-<section id="settingsView" class="hidden"><form class="panel form" id="settingsForm"><h2>Exchange settings</h2><div class="row"><label>Customer rate<input id="settingRate" inputmode="decimal" required></label><label>Minimum USDT<input id="settingMin" inputmode="decimal" required></label><label>Maximum USDT<input id="settingMax" inputmode="decimal" required></label></div><label>Operations notification email<input id="settingEmail" type="email"></label><label>WhatsApp message template<textarea id="settingMessage" required></textarea><small>Available: {{name}}, {{reference}}, {{send}}, {{receive}}</small></label><label class="switch"><input id="settingEnabled" type="checkbox"> Accept new exchange requests</label><p class="error" id="settingsError"></p><button>Save settings</button></form></section>
-</main></div>
-<dialog id="detailDialog"><div class="dialog__head"><div><h2 id="detailRef"></h2><span class="badge" id="detailStatus"></span></div><button id="closeDetail" aria-label="Close">×</button></div><div id="detailBody"></div></dialog>
-</body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b1731">
+  <title>Dahabi Pay Operations</title>
+  <link rel="stylesheet" href="/admin/assets/admin.css">
+  <script type="module" src="/admin/assets/admin.js"></script>
+</head>
+<body>
+  <section class="login hidden" id="login">
+    <form class="login__card" id="loginForm">
+      <a class="brand brand--login" href="/"><b>D</b><span>Dahabi Pay<small>OPERATIONS</small></span></a>
+      <span class="eyebrow">SECURE STAFF ACCESS</span>
+      <h1>Welcome back</h1>
+      <p>Sign in with your authorized staff email. We’ll send you an eight-digit verification code.</p>
+      <label>Email address<input id="loginEmail" type="email" autocomplete="email" placeholder="you@company.com" required></label>
+      <label id="codeField" class="hidden">Verification code<input id="loginCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Enter 8-digit code"></label>
+      <p class="error" id="loginError" role="alert"></p>
+      <button class="button button--primary button--wide" id="loginButton">Send sign-in code</button>
+      <p class="login__foot">Manual exchange operations · Secure staff portal</p>
+    </form>
+  </section>
+
+  <div class="app hidden" id="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar__top">
+        <a class="brand" href="/"><b>D</b><span>Dahabi Pay<small>OPERATIONS</small></span></a>
+        <span class="sidebar__environment">PRODUCTION</span>
+      </div>
+      <nav class="nav" aria-label="Main navigation">
+        <span class="nav__label">WORKSPACE</span>
+        <button class="nav__item active" data-view="dashboard"><span class="nav__icon">⌂</span><span>Overview</span></button>
+        <button class="nav__item" data-view="requests"><span class="nav__icon">▤</span><span>Exchange requests</span><span class="nav__count" id="navRequestCount">0</span></button>
+        <span class="nav__label nav__label--secondary">CONFIGURATION</span>
+        <button class="nav__item" data-view="settings"><span class="nav__icon">⚙</span><span>Exchange settings</span></button>
+      </nav>
+      <div class="sidebar__bottom">
+        <div class="sidebar-status">
+          <div class="sidebar-status__top"><span class="status-dot" id="sidebarStatusDot"></span><strong id="sidebarServiceState">Checking service</strong></div>
+          <p id="sidebarStatusHint">Loading current exchange settings</p>
+          <button class="sidebar-status__link" data-open-settings>Manage availability <span>↗</span></button>
+        </div>
+        <div class="profile">
+          <span class="profile__avatar" id="staffAvatar">D</span>
+          <div class="profile__copy"><strong id="staffName"></strong><small id="staffRole"></small></div>
+          <button class="profile__logout" id="logout" aria-label="Sign out" title="Sign out">↗</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="Open navigation">☰</button>
+        <div class="breadcrumbs"><span>Dahabi Pay</span><i>/</i><strong id="crumbTitle">Overview</strong></div>
+        <div class="topbar__actions">
+          <label class="global-search"><span>⌕</span><input id="globalSearch" type="search" placeholder="Search requests…" aria-label="Search requests"><kbd>↵</kbd></label>
+          <span class="topbar__divider"></span>
+          <span class="topbar__date" id="todayLabel"></span>
+          <span class="topbar__avatar" id="topAvatar">D</span>
+        </div>
+      </header>
+
+      <div class="page">
+        <section class="view" id="dashboardView">
+          <div class="page-heading">
+            <div><span class="eyebrow">OPERATIONS CENTER</span><h1>Good day, <span id="welcomeName">team</span></h1><p>Here’s what’s happening with your exchange requests.</p></div>
+            <button class="button button--dark" data-open-requests>View all requests <span>→</span></button>
+          </div>
+          <div class="notice notice--paused hidden" id="serviceNotice" role="status"><span class="notice__icon">Ⅱ</span><div><strong>New requests are paused</strong><span id="serviceNoticeText">Customers can’t submit an exchange until the service is enabled.</span></div><button class="button button--small" data-open-settings id="noticeSettings">Review settings</button></div>
+
+          <div class="metric-grid">
+            <article class="metric-card metric-card--amber"><div class="metric-card__top"><span class="metric-icon">◷</span><span class="metric-kicker">NEEDS ATTENTION</span></div><strong class="metric-value" id="verifiedCount">0</strong><div class="metric-card__bottom"><span>Awaiting contact</span><span class="metric-arrow">↗</span></div></article>
+            <article class="metric-card metric-card--blue"><div class="metric-card__top"><span class="metric-icon">☏</span><span class="metric-kicker">CUSTOMER REACHED</span></div><strong class="metric-value" id="contactedCount">0</strong><div class="metric-card__bottom"><span>Contacted</span><span class="metric-arrow">↗</span></div></article>
+            <article class="metric-card metric-card--violet"><div class="metric-card__top"><span class="metric-icon">⇄</span><span class="metric-kicker">IN PROGRESS</span></div><strong class="metric-value" id="activeCount">0</strong><div class="metric-card__bottom"><span>Active exchanges</span><span class="metric-arrow">↗</span></div></article>
+            <article class="metric-card metric-card--green"><div class="metric-card__top"><span class="metric-icon">✓</span><span class="metric-kicker">SUCCESSFULLY CLOSED</span></div><strong class="metric-value" id="completedCount">0</strong><div class="metric-card__bottom"><span>Completed</span><span class="metric-arrow">↗</span></div></article>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel pipeline-panel">
+              <div class="section-heading"><div><span class="eyebrow">REQUEST WORKFLOW</span><h2>Exchange pipeline</h2></div><span class="live-pill"><i></i> LIVE</span></div>
+              <div class="pipeline" id="pipeline">
+                <div class="pipeline-step pipeline-step--amber"><span class="pipeline-step__number" id="pipelineVerified">0</span><span>Awaiting contact</span><i></i></div>
+                <div class="pipeline-step pipeline-step--blue"><span class="pipeline-step__number" id="pipelineContacted">0</span><span>Contacted</span><i></i></div>
+                <div class="pipeline-step pipeline-step--violet"><span class="pipeline-step__number" id="pipelineProgress">0</span><span>In progress</span><i></i></div>
+                <div class="pipeline-step pipeline-step--green"><span class="pipeline-step__number" id="pipelineCompleted">0</span><span>Completed</span></div>
+              </div>
+              <div class="pipeline-foot"><span>Requests move through each stage as your team works with the customer.</span><button class="text-button" data-open-requests>Open request queue →</button></div>
+            </section>
+            <section class="panel offer-panel">
+              <div class="section-heading"><div><span class="eyebrow">CUSTOMER OFFER</span><h2>Current exchange rate</h2></div><span class="offer-symbol">↗</span></div>
+              <div class="offer-pair"><span class="coin coin--usdt">₮</span><span class="offer-pair__label">USDT <small>TRC20</small></span><span class="offer-equals">→</span><span class="coin coin--usd">$</span><span class="offer-pair__label">Money Go <small>USD</small></span></div>
+              <div class="offer-rate"><strong id="offerRate">Not set</strong><span>USD per USDT</span></div>
+              <div class="offer-range"><span>Minimum <strong id="offerMin">—</strong></span><span>Maximum <strong id="offerMax">—</strong></span></div>
+              <button class="button button--light button--wide" data-open-settings id="offerManage">Manage offer settings <span>→</span></button>
+            </section>
+          </div>
+
+          <section class="panel recent-panel">
+            <div class="section-heading section-heading--table"><div><span class="eyebrow">LATEST ACTIVITY</span><h2>Recent requests</h2></div><button class="button button--light" data-open-requests>All requests <span>→</span></button></div>
+            <div id="recent" class="table-mount"></div>
+          </section>
+        </section>
+
+        <section id="requestsView" class="view hidden">
+          <div class="page-heading"><div><span class="eyebrow">CUSTOMER OPERATIONS</span><h1>Exchange requests</h1><p>Review verified requests and manage each exchange through completion.</p></div><span class="queue-total"><strong id="requestTotal">—</strong><span>matching requests</span></span></div>
+          <section class="panel requests-panel">
+            <div class="filters"><label class="filter-search"><span>⌕</span><input id="search" placeholder="Search reference, name, email or WhatsApp"></label><label class="filter-select"><span>Status</span><select id="statusFilter"><option value="">All statuses</option><option value="verified">Awaiting contact</option><option value="contacted">Contacted</option><option value="in_progress">In progress</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select></label><label class="filter-date"><span>From</span><input id="fromDate" type="date"></label><label class="filter-date"><span>To</span><input id="toDate" type="date"></label><button class="button button--primary" id="filterBtn">Apply filters</button></div>
+            <div id="requestList" class="table-mount"></div>
+          </section>
+        </section>
+
+        <section id="settingsView" class="view hidden">
+          <div class="page-heading"><div><span class="eyebrow">ADMINISTRATION</span><h1>Exchange settings</h1><p>Control the customer quote and whether new requests are accepted.</p></div><span class="settings-lock">⌑ <span>Admin controls</span></span></div>
+          <form class="panel form settings-panel" id="settingsForm">
+            <div class="form-section"><span class="eyebrow">CUSTOMER QUOTE</span><h2>Rate and exchange limits</h2><p>These values are shown to customers and stored with every verified quote.</p><div class="row"><label>Customer rate <span class="input-suffix"><input id="settingRate" inputmode="decimal" placeholder="0.00" required><i>USD / USDT</i></span></label><label>Minimum amount <span class="input-suffix"><input id="settingMin" inputmode="decimal" placeholder="0.00" required><i>USDT</i></span></label><label>Maximum amount <span class="input-suffix"><input id="settingMax" inputmode="decimal" placeholder="0.00" required><i>USDT</i></span></label></div></div>
+            <div class="form-section"><span class="eyebrow">OPERATIONS</span><h2>Notifications and contact</h2><label>Operations notification email<input id="settingEmail" type="email" placeholder="operations@dahabipay.com"></label><label>WhatsApp message template<textarea id="settingMessage" required rows="4"></textarea><small>Use {{name}}, {{reference}}, {{send}}, and {{receive}} to personalize each message.</small></label></div>
+            <div class="form-section form-section--last"><div class="availability-row"><div><span class="eyebrow">PUBLIC AVAILABILITY</span><h2>Accept new exchange requests</h2><p>Turn this on only after the rate, limits, and email flow have been tested.</p></div><label class="toggle"><input id="settingEnabled" type="checkbox"><span></span></label></div><div class="settings-actions"><p class="error" id="settingsError" role="status"></p><button class="button button--primary">Save changes</button></div></div>
+          </form>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <dialog id="detailDialog" class="detail-dialog"><div class="dialog__head"><div><span class="eyebrow">REQUEST DETAILS</span><h2 id="detailRef"></h2><span class="badge" id="detailStatus"></span></div><button id="closeDetail" class="icon-button" aria-label="Close">×</button></div><div id="detailBody"></div></dialog>
+</body>
+</html>

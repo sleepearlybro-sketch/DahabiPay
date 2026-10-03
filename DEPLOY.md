@@ -4,7 +4,7 @@
 
 1. Open the intended Supabase production project.
 2. Run `supabase/migrations/202609230001_manual_exchange.sql` in the SQL editor.
-3. In Auth email templates, change the magic-link template to show the six-digit `{{ .Token }}`.
+3. In Auth email templates, change the magic-link template to show the emailed OTP using `{{ .Token }}`. The app currently accepts the eight-digit token Supabase is sending in production.
 4. Configure a production custom SMTP provider in Supabase Auth.
 5. Create the first staff user in Supabase Auth.
 6. Insert its Auth UUID, lowercase email, display name, `admin` role, and `active = true` into `staff_profiles`.

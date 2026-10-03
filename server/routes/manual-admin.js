@@ -28,7 +28,7 @@ export function createAdminRouter(deps = {}) {
     try {
       const email = normalizeEmail(req.body.email);
       const otp = String(req.body.otp || '').trim();
-      if (!/^\d{6}$/.test(otp)) return res.status(400).json({ error: 'Enter the six-digit code', field: 'otp' });
+      if (!/^\d{8}$/.test(otp)) return res.status(400).json({ error: 'Enter the eight-digit code', field: 'otp' });
       const staff = await data.findActiveStaffByEmail(email);
       if (!staff) return res.status(403).json({ error: 'This email is not authorized for staff access' });
       const verified = await auth().auth.verifyOtp({ email, token: otp, type: 'email' });

@@ -60,7 +60,7 @@ export function createPublicRouter(deps = {}) {
     try {
       const contact = validateContact(req.body);
       const token = String(req.body.otp || '').trim();
-      if (!/^\d{6}$/.test(token)) return res.status(400).json({ error: 'Enter the six-digit code', field: 'otp' });
+      if (!/^\d{8}$/.test(token)) return res.status(400).json({ error: 'Enter the eight-digit code', field: 'otp' });
       const quote = verifyQuote(req.body.quoteToken, config.quote.secret);
       const verified = await auth().auth.verifyOtp({ email: contact.email, token, type: 'email' });
       if (verified.error || !verified.data?.user) return res.status(400).json({ error: 'The code is incorrect or expired', field: 'otp' });

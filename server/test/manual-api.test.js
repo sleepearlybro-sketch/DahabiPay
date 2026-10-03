@@ -16,7 +16,7 @@ function fixture({ otpError = null } = {}) {
   };
   const fakeAuth = { auth: {
     signInWithOtp: async () => ({ data: {}, error: null }),
-    verifyOtp: async ({ email, token }) => otpError || token !== '123456'
+    verifyOtp: async ({ email, token }) => otpError || token !== '12345678'
       ? { data: {}, error: { message: 'bad code' } }
       : { data: { user: { id: 'user-1', email } }, error: null }
   } };
@@ -41,14 +41,15 @@ test('request is created only after a valid OTP and signed quote', async (t) => 
   const contact = { fullName: 'Ada Doe', email: 'ada@example.com', whatsapp: '+254712345678', moneygoAccount: 'MG-12345', quoteToken: quote.body.quoteToken };
   assert.equal((await post(origin, '/api/requests/otp', contact)).status, 200);
   assert.equal(created.length, 0);
-  assert.equal((await post(origin, '/api/requests/verify', { ...contact, otp: '000000' })).status, 400);
+  assert.equal((await post(origin, '/api/requests/verify', { ...contact, otp: '123456' })).status, 400);
+  assert.equal((await post(origin, '/api/requests/verify', { ...contact, otp: '00000000' })).status, 400);
   assert.equal(created.length, 0);
-  const verified = await post(origin, '/api/requests/verify', { ...contact, otp: '123456' });
+  const verified = await post(origin, '/api/requests/verify', { ...contact, otp: '12345678' });
   assert.equal(verified.status, 201); assert.match(verified.body.reference, /^DP-/); assert.equal(created.length, 1);
 });
 test('tampered and expired-style invalid quotes never reach OTP provider', async (t) => {
   clearRateLimits(); const { app, created } = fixture(); const { server, origin } = await start(app); t.after(() => server.close());
-  const result = await post(origin, '/api/requests/verify', { fullName: 'Ada Doe', email: 'ada@example.com', whatsapp: '+254712345678', moneygoAccount: 'MG-12345', quoteToken: 'bad.quote', otp: '123456' });
+  const result = await post(origin, '/api/requests/verify', { fullName: 'Ada Doe', email: 'ada@example.com', whatsapp: '+254712345678', moneygoAccount: 'MG-12345', quoteToken: 'bad.quote', otp: '12345678' });
   assert.equal(result.status, 409); assert.equal(created.length, 0);
 });
 test('customer OTP requests are rate limited by email', async (t) => {

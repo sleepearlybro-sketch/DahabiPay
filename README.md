@@ -2,7 +2,7 @@
 
 Dahabi Pay is a mobile-first manual exchange-request service for one pair: **Tether USDT on TRC20 → Money Go USD**.
 
-Customers receive a server-signed quote, submit contact and Money Go details, and verify a six-digit email OTP. Only then is the request recorded. Staff use an OTP-protected operations panel to contact the customer on WhatsApp, add internal notes, and move the request through an audited workflow.
+Customers receive a server-signed quote, submit contact and Money Go details, and verify an eight-digit email OTP. Only then is the request recorded. Staff use an OTP-protected operations panel to contact the customer on WhatsApp, add internal notes, and move the request through an audited workflow.
 
 The application does not receive cryptocurrency, expose wallets or balances, or automate settlement.
 

@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { parsePhoneNumberFromString } from 'libphonenumber-js/max';
 import * as M from './money.js';
 
 export const REQUEST_STATUSES = ['verified', 'contacted', 'in_progress', 'completed', 'cancelled'];
@@ -32,10 +33,9 @@ export function calculateReceive(amount, rate) {
 export function normalizeWhatsapp(value) {
   let phone = String(value ?? '').trim().replace(/[\s().-]/g, '');
   if (phone.startsWith('00')) phone = '+' + phone.slice(2);
-  if (!/^\+[1-9]\d{7,14}$/.test(phone)) {
-    throw fieldError('whatsapp', 'Enter WhatsApp with country code, for example +254712345678');
-  }
-  return phone;
+  const parsed = parsePhoneNumberFromString(phone);
+  if (!parsed?.isValid() || parsed.number.length > 16) throw fieldError('whatsapp', 'Enter a valid WhatsApp number with country code, such as +254712345678');
+  return parsed.number;
 }
 
 export function normalizeEmail(value) {

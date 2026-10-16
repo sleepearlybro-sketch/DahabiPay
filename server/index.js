@@ -3,7 +3,9 @@ import cookieParser from 'cookie-parser';
 import path from 'node:path';
 import { config, configWarnings, assertRuntimeConfig, ROOT } from './config.js';
 import { attachStaff } from './lib/staff.js';
+import { attachCustomer } from './lib/customer.js';
 import publicRoutes from './routes/manual-public.js';
+import customerRoutes from './routes/manual-customer.js';
 import adminRoutes from './routes/manual-admin.js';
 import * as store from './store.js';
 import { startNotifications, stopNotifications } from './services/notifications.js';
@@ -26,6 +28,7 @@ app.use((_req, res, next) => {
 app.use(express.json({ limit: config.limits.jsonBody }));
 app.use(cookieParser());
 app.use(attachStaff);
+app.use(attachCustomer);
 
 app.get('/api/health', async (_req, res) => {
   try {
@@ -34,8 +37,10 @@ app.get('/api/health', async (_req, res) => {
   } catch { res.status(503).json({ ok: false, database: 'unavailable' }); }
 });
 app.use('/api', publicRoutes);
+app.use('/api/customer', customerRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/admin', express.static(path.join(ROOT, 'admin'), { index: 'index.html' }));
+app.use('/account', express.static(path.join(ROOT, 'account'), { index: 'index.html' }));
 
 const NEVER_SERVE = [/^\/data(\/|$)/, /^\/server(\/|$)/, /^\/supabase(\/|$)/, /^\/deploy(\/|$)/,
   /^\/node_modules(\/|$)/, /(^|\/)\.env/, /(^|\/)\.git(\/|$)/,
@@ -61,7 +66,8 @@ const server = app.listen(config.port, config.host, () => {
   for (const warning of configWarnings()) console.warn(`warning: ${warning}`);
   startNotifications();
 });
-const sweep = setInterval(() => store.pruneStaffSessions().catch((error) => console.error('session cleanup:', error.message)), 60 * 60_000);
+const sweep = setInterval(() => Promise.all([store.pruneStaffSessions(), store.pruneCustomerSessions()])
+  .catch((error) => console.error('session cleanup:', error.message)), 60 * 60_000);
 sweep.unref();
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => {
   stopNotifications(); clearInterval(sweep); server.close(() => process.exit(0));

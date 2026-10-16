@@ -26,9 +26,42 @@ export async function createRequest(input) {
   if (!result.error) return result.data;
   if (result.error.code === '23505') {
     const existing = await db().from('exchange_requests').select('*').eq('quote_jti', input.quoteJti).maybeSingle();
-    if (!existing.error && existing.data && existing.data.email === input.email) return existing.data;
+    if (!existing.error && existing.data && existing.data.customer_auth_id === input.customerAuthId) return existing.data;
   }
   return throwIfError(result, 'Create exchange request');
+}
+
+export async function createCustomerSession({ tokenHash, customerAuthId, email, expiresAt, ip, userAgent }) {
+  return throwIfError(await db().from('customer_sessions').insert({
+    token_hash: tokenHash,
+    customer_auth_id: customerAuthId,
+    email,
+    expires_at: expiresAt,
+    ip,
+    user_agent: userAgent
+  }).select('token_hash,customer_auth_id,email,expires_at').single(), 'Create customer session');
+}
+
+export async function getCustomerSession(tokenHash) {
+  const session = throwIfError(await db().from('customer_sessions')
+    .select('token_hash,customer_auth_id,email,expires_at').eq('token_hash', tokenHash).maybeSingle(), 'Load customer session');
+  if (!session || new Date(session.expires_at).getTime() <= Date.now()) return null;
+  return { session, customer: { id: session.customer_auth_id, email: session.email } };
+}
+
+export async function deleteCustomerSession(tokenHash) {
+  throwIfError(await db().from('customer_sessions').delete().eq('token_hash', tokenHash), 'Delete customer session');
+}
+
+export async function pruneCustomerSessions() {
+  await db().from('customer_sessions').delete().lte('expires_at', new Date().toISOString());
+}
+
+export async function listCustomerRequests(customerAuthId) {
+  return throwIfError(await db().from('exchange_requests')
+    .select('id,reference,send_usdt,rate,receive_usd,status,created_at,updated_at')
+    .eq('customer_auth_id', customerAuthId)
+    .order('created_at', { ascending: false }).limit(100), 'Load customer requests');
 }
 
 export async function findActiveStaffByEmail(email) {

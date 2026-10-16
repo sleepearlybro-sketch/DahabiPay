@@ -26,7 +26,12 @@ export const config = {
   staffSession: {
     cookie: 'dp_staff',
     hours: num(process.env.STAFF_SESSION_HOURS, 12),
-    secure: bool(process.env.COOKIE_SECURE, false)
+    secure: bool(process.env.COOKIE_SECURE, process.env.NODE_ENV === 'production')
+  },
+  customerSession: {
+    cookie: 'dp_customer',
+    days: num(process.env.CUSTOMER_SESSION_DAYS, 7),
+    secure: bool(process.env.COOKIE_SECURE, process.env.NODE_ENV === 'production')
   },
   mail: {
     host: process.env.SMTP_HOST || '',

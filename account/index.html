@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Sign in and view your Dahabi Pay exchange requests.">
+  <title>My requests · Dahabi Pay</title>
+  <link rel="stylesheet" href="/assets/css/app.css">
+  <script type="module" src="/assets/js/account.js"></script>
+</head>
+<body>
+  <header class="top"><nav class="nav"><a class="brand" href="/"><span class="brand__mark">D</span>Dahabi Pay</a><div class="nav__links"><a href="/">New request</a><a href="mailto:support@dahabipay.com">Contact</a></div></nav></header>
+  <main class="account-page">
+    <div class="account-heading"><div><div class="eyebrow">Your Dahabi Pay account</div><h1>My requests</h1><p>Sign in with your email to see the exchange requests you submitted.</p></div><a class="account-new" href="/">+ New request</a></div>
+    <section class="account-card" id="signIn">
+      <div id="emailStage"><h2>Sign in by email</h2><p class="muted">We’ll send you a one-time code. You don’t need a password.</p><label class="account-label" for="accountEmail">Email address</label><input id="accountEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com"><button class="btn account-action" id="sendCode">Send email code</button></div>
+      <div id="codeStage" class="hidden"><h2>Enter your code</h2><p class="muted">Check <strong id="sentEmail"></strong> for your verification code.</p><label class="account-label" for="accountOtp">Email code</label><input class="otp" id="accountOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="8"><button class="btn account-action" id="verifyCode">Verify and sign in</button><div class="account-links"><button type="button" id="changeEmail">Change email</button><button type="button" id="resendCode" disabled>Resend in 60s</button></div></div>
+      <p class="error" id="authError" role="alert"></p>
+    </section>
+    <section id="requestsStage" class="hidden"><div class="account-toolbar"><div><h2>Your exchange requests</h2><p class="muted">Signed in as <strong id="signedInEmail"></strong></p></div><button class="btn btn--secondary" id="signOut">Sign out</button></div><p class="error" id="requestError" role="alert"></p><div id="requestList" class="request-list" aria-live="polite"></div></section>
+  </main>
+  <footer class="footer"><div class="footer__in"><span>© 2026 Dahabi Pay · Manual exchange requests</span><span><a href="/privacy">Privacy</a><a href="/agreement">Terms</a></span></div></footer>
+</body>
+</html>

@@ -3,7 +3,7 @@
 ## 1. Configure Supabase
 
 1. Open the intended Supabase production project.
-2. Run `supabase/migrations/202609230001_manual_exchange.sql` in the SQL editor.
+2. Run `supabase/migrations/202609230001_manual_exchange.sql`, then `supabase/migrations/202610160001_customer_sessions.sql` in the SQL editor.
 3. In Auth email templates, change the magic-link template to show the emailed OTP using `{{ .Token }}`. The app currently accepts the eight-digit token Supabase is sending in production.
 4. Configure a production custom SMTP provider in Supabase Auth.
 5. Create the first staff user in Supabase Auth.
@@ -37,7 +37,7 @@ Do not reuse or expose the old Railway PostgreSQL password. The new application 
 1. Leave `exchange_settings.accepting_requests=false`.
 2. Deploy the GitHub `main` branch and confirm `/api/health` reports Supabase PostgreSQL.
 3. Sign in to `/admin/`, set the final rate, minimum, maximum, operations email, and WhatsApp template.
-4. Keep requests disabled while testing both customer OTP and staff OTP with team-controlled addresses.
+4. Keep requests disabled while testing both customer OTP and staff OTP with team-controlled addresses. After signing in at `/account/`, verify that the customer sees only their own requests.
 5. Temporarily enable requests and submit one controlled request.
 6. Confirm the admin email, dashboard record, WhatsApp link, internal note, status history, completion, and SSE/polling refresh.
 7. Enable public requests after acceptance.

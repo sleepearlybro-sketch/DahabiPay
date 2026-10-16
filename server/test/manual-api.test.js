@@ -73,6 +73,13 @@ test('disabled requests cannot be quoted or submitted', async (t) => {
   assert.equal(created.length, 0);
 });
 
+test('public contact exposes only configured support channels', async (t) => {
+  clearRateLimits(); const { app } = fixture(); const { server, origin } = await start(app); t.after(() => server.close());
+  const response = await fetch(origin + '/api/public/contact');
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { email: 'support@dahabipay.com', whatsapp: null });
+});
+
 test('request history is available only to its signed-in customer', async (t) => {
   clearRateLimits(); const guest = fixture(); const live = fixture({ signedIn: true });
   const guestServer = await start(guest.app); const liveServer = await start(live.app);

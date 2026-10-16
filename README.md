@@ -16,10 +16,12 @@ The application does not receive cryptocurrency, expose wallets or balances, or 
 ## Local setup
 
 1. Copy `.env.example` to `.env` and enter development Supabase credentials.
-2. Run the migrations in `supabase/migrations/202609230001_manual_exchange.sql`, `supabase/migrations/202610160001_customer_sessions.sql`, and `supabase/migrations/202610160002_staff_credentials.sql` in order.
+2. Run the migrations in `supabase/migrations/202609230001_manual_exchange.sql`, `supabase/migrations/202610160001_customer_sessions.sql`, `supabase/migrations/202610160002_staff_credentials.sql`, and `supabase/migrations/202610160003_public_contact.sql` in order.
 3. Create a Supabase Auth user and add the same user ID and lowercase email to `staff_profiles` with role `admin`.
 4. Run `npm install`, then `npm run dev`.
 5. Sign in at `/admin/` with the first admin's email OTP, set a username and password when prompted, then set a positive rate and limits. Enable requests only after testing.
+
+The Contact page shows the public support email and, once configured in admin settings, a clickable business WhatsApp number. A sample WhatsApp format is never used as a chat destination.
 
 ## Security model
 

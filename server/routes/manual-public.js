@@ -12,6 +12,13 @@ export function createPublicRouter(deps = {}) {
   const data = deps.store || store;
   const notify = deps.processOutbox || processOutbox;
 
+  router.get('/public/contact', async (_req, res, next) => {
+    try {
+      const settings = await data.getSettings();
+      res.json({ email: settings.support_email || 'support@dahabipay.com', whatsapp: settings.support_whatsapp || null });
+    } catch (error) { next(error); }
+  });
+
   router.get('/public/offer', async (_req, res, next) => {
     try {
       const s = await data.getSettings();

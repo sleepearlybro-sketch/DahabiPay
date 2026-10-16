@@ -191,6 +191,8 @@ export async function updateSettings(values, staff) {
     max_usdt: values.maxUsdt,
     accepting_requests: values.acceptingRequests,
     operations_email: values.operationsEmail || null,
+    support_email: values.supportEmail,
+    support_whatsapp: values.supportWhatsapp,
     whatsapp_template: values.whatsappTemplate,
     updated_by: staff.user_id,
     updated_at: new Date().toISOString()

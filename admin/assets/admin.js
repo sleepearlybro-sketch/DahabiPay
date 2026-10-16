@@ -131,6 +131,8 @@ async function loadSettings() {
   const data = await api('/settings'); state.settings = data.settings;
   $('#settingRate').value = data.settings.rate || ''; $('#settingMin').value = data.settings.min_usdt || ''; $('#settingMax').value = data.settings.max_usdt || '';
   $('#settingEmail').value = data.settings.operations_email || ''; $('#settingMessage').value = data.settings.whatsapp_template || ''; $('#settingEnabled').checked = data.settings.accepting_requests;
+  $('#settingSupportEmail').value = data.settings.support_email || 'support@dahabipay.com';
+  $('#settingSupportWhatsapp').value = data.settings.support_whatsapp || '';
   renderOffer(); renderServiceStatus();
 }
 function renderOffer() {
@@ -156,7 +158,7 @@ $('#settingsForm').addEventListener('submit', async (event) => {
   event.preventDefault(); $('#settingsError').textContent = '';
   const button = event.submitter; button.disabled = true;
   try {
-    const result = await api('/settings', { method: 'PATCH', body: JSON.stringify({ rate: $('#settingRate').value, minUsdt: $('#settingMin').value, maxUsdt: $('#settingMax').value, operationsEmail: $('#settingEmail').value, whatsappTemplate: $('#settingMessage').value, acceptingRequests: $('#settingEnabled').checked }) });
+    const result = await api('/settings', { method: 'PATCH', body: JSON.stringify({ rate: $('#settingRate').value, minUsdt: $('#settingMin').value, maxUsdt: $('#settingMax').value, operationsEmail: $('#settingEmail').value, supportEmail: $('#settingSupportEmail').value, supportWhatsapp: $('#settingSupportWhatsapp').value, whatsappTemplate: $('#settingMessage').value, acceptingRequests: $('#settingEnabled').checked }) });
     state.settings = result.settings; $('#settingsError').style.color = '#16834b'; $('#settingsError').textContent = 'Settings saved.'; renderOffer(); renderServiceStatus();
   } catch (e) { $('#settingsError').style.color = ''; $('#settingsError').textContent = e.message; }
   finally { button.disabled = false; }

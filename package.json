@@ -11,7 +11,7 @@
     "start": "node --env-file-if-exists=.env --no-warnings server/index.js",
     "dev": "node --env-file-if-exists=.env --no-warnings --watch server/index.js",
     "test": "node --test --no-warnings \"server/test/manual*.test.js\"",
-    "check": "node --check server/index.js && node --check server/routes/manual-public.js && node --check server/routes/manual-customer.js && node --check server/lib/customer.js && node --check server/lib/manual.js && node --check assets/js/manual.js && node --check assets/js/account.js && node --check assets/js/phone.js && node --check admin/assets/admin.js"
+    "check": "node --check server/index.js && node --check server/routes/manual-public.js && node --check server/routes/manual-customer.js && node --check server/lib/customer.js && node --check server/lib/manual.js && node --check assets/js/manual.js && node --check assets/js/account.js && node --check assets/js/contact.js && node --check assets/js/phone.js && node --check admin/assets/admin.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.1",

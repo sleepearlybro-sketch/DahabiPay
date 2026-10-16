@@ -2,7 +2,7 @@ import express from 'express';
 import { config } from '../config.js';
 import { supabaseAdmin, supabaseAuth } from '../supabase.js';
 import * as store from '../store.js';
-import { canTransition, cleanText, normalizeAmount, normalizeEmail, sessionToken } from '../lib/manual.js';
+import { canTransition, cleanText, normalizeAmount, normalizeEmail, normalizeWhatsapp, sessionToken } from '../lib/manual.js';
 import { clientIp, rateLimit } from '../lib/rate-limit.js';
 import { clearStaffCookie, requireAdmin, requireStaff, setStaffCookie } from '../lib/staff.js';
 import { connectEvents, publishEvent } from '../events.js';
@@ -168,8 +168,10 @@ export function createAdminRouter(deps = {}) {
       const maxUsdt = normalizeAmount(req.body.maxUsdt);
       if (Number(maxUsdt) < Number(minUsdt)) return res.status(400).json({ error: 'Maximum must be greater than or equal to minimum', field: 'maxUsdt' });
       const operationsEmail = req.body.operationsEmail ? normalizeEmail(req.body.operationsEmail) : '';
+      const supportEmail = normalizeEmail(req.body.supportEmail);
+      const supportWhatsapp = req.body.supportWhatsapp ? normalizeWhatsapp(req.body.supportWhatsapp) : null;
       const whatsappTemplate = cleanText(req.body.whatsappTemplate, 'whatsappTemplate', { min: 5, max: 1000 });
-      const settings = await data.updateSettings({ rate, minUsdt, maxUsdt, acceptingRequests: Boolean(req.body.acceptingRequests), operationsEmail, whatsappTemplate }, req.staff.staff);
+      const settings = await data.updateSettings({ rate, minUsdt, maxUsdt, acceptingRequests: Boolean(req.body.acceptingRequests), operationsEmail, supportEmail, supportWhatsapp, whatsappTemplate }, req.staff.staff);
       publishEvent('settings.updated', { acceptingRequests: settings.accepting_requests });
       res.json({ settings });
     } catch (error) { next(error); }

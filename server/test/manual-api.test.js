@@ -8,7 +8,7 @@ import { clearRateLimits } from '../lib/rate-limit.js';
 
 const customer = { id: 'user-1', email: 'ada@example.com' };
 function fixture({ signedIn = false, accepting = true } = {}) {
-  const created = []; const sessions = []; const authCalls = [];
+  const created = []; const sessions = []; const authCalls = []; const listedFor = [];
   const store = {
     getSettings: async () => ({ rate: '0.98', min_usdt: '10', max_usdt: '1000', accepting_requests: accepting }),
     createRequest: async (input) => {
@@ -16,7 +16,7 @@ function fixture({ signedIn = false, accepting = true } = {}) {
       return { id: 'r1', reference: input.reference, send_usdt: input.sendUsdt, rate: input.rate, receive_usd: input.receiveUsd };
     },
     createCustomerSession: async (input) => { sessions.push(input); return input; },
-    listCustomerRequests: async () => []
+    listCustomerRequests: async (id) => { listedFor.push(id); return [{ reference: 'DP-TEST', status: 'verified' }]; }
   };
   const auth = { auth: {
     signInWithOtp: async (input) => { authCalls.push(input); return { error: null }; },
@@ -29,7 +29,7 @@ function fixture({ signedIn = false, accepting = true } = {}) {
   app.use('/api', createPublicRouter({ store, processOutbox: async () => {} }));
   app.use('/api/customer', createCustomerRouter({ store, auth: () => auth }));
   app.use((error, _req, res, _next) => res.status(error.status || 500).json({ error: error.message, code: error.code }));
-  return { app, created, sessions, authCalls };
+  return { app, created, sessions, authCalls, listedFor };
 }
 async function start(app) {
   const server = app.listen(0, '127.0.0.1'); await once(server, 'listening');
@@ -71,4 +71,15 @@ test('disabled requests cannot be quoted or submitted', async (t) => {
   clearRateLimits(); const { app, created } = fixture({ signedIn: true, accepting: false }); const { server, origin } = await start(app); t.after(() => server.close());
   assert.equal((await post(origin, '/api/public/quote', { amount: '100' })).status, 503);
   assert.equal(created.length, 0);
+});
+
+test('request history is available only to its signed-in customer', async (t) => {
+  clearRateLimits(); const guest = fixture(); const live = fixture({ signedIn: true });
+  const guestServer = await start(guest.app); const liveServer = await start(live.app);
+  t.after(() => { guestServer.server.close(); liveServer.server.close(); });
+  assert.equal((await fetch(guestServer.origin + '/api/customer/requests')).status, 401);
+  const response = await fetch(liveServer.origin + '/api/customer/requests');
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).requests[0].reference, 'DP-TEST');
+  assert.deepEqual(live.listedFor, [customer.id]);
 });

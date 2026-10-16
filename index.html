@@ -22,18 +22,21 @@
       <div class="trust"><span>Email verified</span><span>Clear rate</span><span>Human support</span></div>
     </div>
     <main class="exchange" id="exchange" aria-live="polite">
-      <div class="steps" aria-label="Progress"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+      <ol class="steps" aria-label="Request progress"><li class="on"><span>1</span><small>Quote</small></li><li><span>2</span><small>Details</small></li><li><span>3</span><small>Email code</small></li><li><span>4</span><small>Review</small></li><li><span>5</span><small>Done</small></li></ol>
       <section data-step="1">
-        <h2>Get your quote</h2><p class="muted" id="availability">Loading the current offer…</p>
+        <h2>Get your quote</h2><p class="muted">Enter the USDT amount to preview how much Money Go USD you’ll receive.</p>
+        <div class="offer-status" id="offerStatus" role="status">Loading the current offer…</div>
         <div class="pair"><div class="asset"><span class="coin">₮</span><div><strong>You send</strong><small>Tether USDT · TRC20</small></div></div></div>
-        <div class="field"><label for="amount">Amount</label><div class="input-wrap"><input id="amount" inputmode="decimal" autocomplete="off" placeholder="0.00"><span class="suffix">USDT</span></div></div>
+        <div class="field"><label for="amount">Amount you want to exchange</label><div class="input-wrap"><input id="amount" inputmode="decimal" autocomplete="off" placeholder="e.g. 100" aria-describedby="amountHelp"><span class="suffix">USDT</span></div><small class="field-hint" id="amountHelp">Enter an amount within the limits shown below.</small></div>
         <div class="pair"><div class="asset"><span class="coin money">$</span><div><strong>You receive</strong><small>Money Go · USD</small></div></div><strong id="receive">$0.00</strong></div>
         <div class="quote"><span>Rate</span><b id="rate">—</b><span>Limits</span><b id="limits">—</b></div>
-        <p class="notice">This is a manual request. No cryptocurrency is sent through this website. Our team will contact you before the exchange proceeds.</p>
-        <p class="error" role="alert"></p><button class="btn" id="quoteBtn" disabled>Continue</button>
+        <p class="notice">Our team will contact you before the exchange proceeds.</p>
+        <p class="error" role="alert"></p><button class="btn" id="quoteBtn" disabled>Checking availability…</button>
+        <p class="next-step" id="quoteHelp">Next: you’ll enter your details and verify your email. No password is needed.</p>
       </section>
       <section data-step="2" class="hidden">
-        <h2>Your details</h2><p class="muted">Your verified email creates your account. Your WhatsApp number lets our team contact you about this request.</p>
+        <h2>Your details</h2><p class="muted">Your quote is ready. Add your contact and payout details, then we’ll email a code to create or sign in to your account automatically.</p>
+        <div class="step-summary" id="detailsQuote"></div>
         <div class="field"><label for="fullName">Full name</label><input id="fullName" autocomplete="name" placeholder="Your full name"></div>
         <div class="field"><label for="email">Email</label><input id="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com"><small class="field-hint" id="emailHint">We’ll send a sign-in code to this address.</small></div>
         <div class="field"><label for="whatsapp">WhatsApp number</label>
@@ -43,12 +46,12 @@
         </div>
         <div class="field"><label for="moneygoAccount">Money Go account ID or number</label><input id="moneygoAccount" autocomplete="off" maxlength="64" placeholder="Account where you’ll receive USD"><small class="field-hint">Enter the Money Go account identifier where you want to receive USD.</small></div>
         <div class="field"><label for="note">Note <span class="muted">(optional)</span></label><textarea id="note" maxlength="1000" placeholder="Anything our team should know?"></textarea></div>
-        <p class="error" role="alert"></p><div class="actions"><button class="btn btn--secondary" data-back="1">Back</button><button class="btn" id="otpBtn">Send email code</button></div>
+        <p class="error" role="alert"></p><div class="actions"><button class="btn btn--secondary" data-back="1">Back to quote</button><button class="btn" id="otpBtn">Email code &amp; continue</button></div><p class="next-step">We’ll use your email to save this request. You don’t need to choose a password.</p>
       </section>
       <section data-step="3" class="hidden">
-        <h2>Verify your email</h2><p class="muted">Enter the code sent to <strong id="otpEmail"></strong>. This creates your account or signs you back in.</p>
-        <div class="field"><label for="otp">Email verification code</label><input class="otp" id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="8" pattern="[0-9]*"></div>
-        <p class="error" role="alert"></p><button class="btn" id="verifyBtn">Verify email</button><div class="actions"><button class="btn btn--secondary" data-back="2">Change details</button><button class="btn btn--secondary" id="resendBtn" disabled>Resend in 60s</button></div>
+        <h2>Check your email</h2><p class="muted">Enter the eight-digit code sent to <strong id="otpEmail"></strong>. This verifies your email and creates your account if you’re new.</p>
+        <div class="field"><label for="otp">Eight-digit email code</label><input class="otp" id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="8" pattern="[0-9]*" placeholder="00000000"></div>
+        <p class="error" role="alert"></p><button class="btn" id="verifyBtn">Verify &amp; review request</button><div class="actions"><button class="btn btn--secondary" data-back="2">Change details</button><button class="btn btn--secondary" id="resendBtn" disabled>Resend in 60s</button></div><p class="next-step">Can’t find it? Check your spam folder, or resend when the timer ends.</p>
       </section>
       <section data-step="4" class="hidden">
         <h2>Review your request</h2><p class="muted">Your email is verified. Confirm these details before sending the request to our team.</p>

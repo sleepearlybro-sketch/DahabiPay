@@ -13,8 +13,8 @@ function money(v, dp = 2) { return Number(v || 0).toLocaleString(undefined, { mi
 function showStep(number) {
   state.step = number;
   $$('[data-step]').forEach((el) => el.classList.toggle('hidden', Number(el.dataset.step) !== number));
-  $$('.steps i').forEach((el, i) => el.classList.toggle('on', i < number));
-  $('.exchange').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  $$('.steps li').forEach((el, i) => { el.classList.toggle('on', i + 1 === number); el.classList.toggle('done', i + 1 < number); if (i + 1 === number) el.setAttribute('aria-current', 'step'); else el.removeAttribute('aria-current'); });
+  $('.exchange').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
 }
 function error(message = '', field) {
   const box = $('[data-step="' + state.step + '"] .error');
@@ -95,10 +95,13 @@ async function loadOffer() {
     state.offer = await api('/api/public/offer');
     $('#rate').textContent = state.offer.rate ? '1 USDT = ' + money(state.offer.rate, 4) + ' USD' : 'Not configured';
     $('#limits').textContent = state.offer.minUsdt ? money(state.offer.minUsdt, 0) + '–' + money(state.offer.maxUsdt, 0) + ' USDT' : '—';
-    $('#availability').textContent = state.offer.available ? 'Requests are open. Review today’s rate below.' : 'Exchange requests are temporarily paused.';
+    $('#offerStatus').classList.toggle('offer-status--paused', !state.offer.available);
+    $('#offerStatus').textContent = state.offer.available ? 'Requests are open · Enter an amount to continue' : 'Requests are paused · You can preview the rate, but cannot send a request right now.';
+    $('#quoteBtn').textContent = state.offer.available ? 'Accept quote & continue' : 'Requests are paused';
+    $('#quoteHelp').textContent = state.offer.available ? 'Next: you’ll enter your details and verify your email. No password is needed.' : 'Continue is unavailable while requests are paused. Please return later or contact support@dahabipay.com.';
     $('#quoteBtn').disabled = !state.offer.available;
     renderEstimate();
-  } catch (e) { $('#availability').textContent = 'The current offer could not be loaded. Please try again shortly.'; error(e.message); }
+  } catch (e) { $('#offerStatus').classList.add('offer-status--paused'); $('#offerStatus').textContent = 'The current offer could not be loaded. Please try again shortly.'; $('#quoteBtn').textContent = 'Quote unavailable'; error(e.message); }
 }
 $('#amount').addEventListener('input', renderEstimate);
 $('#whatsapp').addEventListener('input', updateWhatsappPreview);
@@ -129,7 +132,9 @@ $('#quoteBtn').addEventListener('click', async () => {
   error(); const button = $('#quoteBtn'); loading(button, true, 'Securing quote…');
   try {
     const result = await api('/api/public/quote', { method: 'POST', body: JSON.stringify({ amount: $('#amount').value }) });
-    state.quoteToken = result.quoteToken; state.quote = result; showStep(2);
+    state.quoteToken = result.quoteToken; state.quote = result;
+    $('#detailsQuote').textContent = `${result.amount} USDT → ${money(result.receiveUsd)} Money Go USD · valid for 15 minutes`;
+    showStep(2);
   } catch (e) { error(e.message, e.field); }
   finally { loading(button, false); button.disabled = !state.offer?.available; }
 });
@@ -166,8 +171,8 @@ function setSignedIn() {
   $('#email').value = state.customer.email;
   $('#email').readOnly = true;
   $('#emailHint').textContent = 'Signed in. Your requests are saved to this email account.';
-  $('#otpBtn').textContent = 'Review request';
-  $('#otpBtn').dataset.label = 'Review request';
+  $('#otpBtn').textContent = 'Continue to review';
+  $('#otpBtn').dataset.label = 'Continue to review';
 }
 function showReview() {
   const details = contact();

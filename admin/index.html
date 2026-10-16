@@ -16,7 +16,7 @@
       <h1>Welcome back</h1>
       <p>Enter your username or email and password. We’ll send an eight-digit code to your staff email.</p>
       <label>Username or email<input id="loginEmail" autocomplete="username" placeholder="you@company.com or username" required></label>
-      <label id="passwordField">Password<input id="loginPassword" type="password" autocomplete="current-password" placeholder="Your password"></label>
+      <label id="passwordField">Password<span class="password-control"><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Your password"><button type="button" data-password-toggle="loginPassword" aria-label="Show password" aria-pressed="false">Show</button></span></label>
       <small>Existing admin signing in for the first time? Leave the password blank, verify your email, then set one.</small>
       <label id="codeField" class="hidden">Verification code<input id="loginCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Enter 8-digit code"></label>
       <p class="error" id="loginError" role="alert"></p>
@@ -27,7 +27,7 @@
       <span class="eyebrow">ONE-TIME ADMIN SETUP</span><h1>Secure your account</h1>
       <p>Choose a username and password to protect future sign-ins. Your next login will require both and an email code.</p>
       <label>Username<input id="setupUsername" autocomplete="username" pattern="[a-z][a-z0-9_]{2,31}" required></label>
-      <label>Password<input id="setupPassword" type="password" autocomplete="new-password" minlength="12" required></label>
+      <label>Password<span class="password-control"><input id="setupPassword" type="password" autocomplete="new-password" minlength="12" required><button type="button" data-password-toggle="setupPassword" aria-label="Show password" aria-pressed="false">Show</button></span></label>
       <small>12 or more characters with uppercase, lowercase and a number.</small>
       <p class="error" id="setupError" role="alert"></p><button class="button button--primary button--wide">Save credentials</button>
     </form>
@@ -75,47 +75,22 @@
 
       <div class="page">
         <section class="view" id="dashboardView">
-          <div class="page-heading">
-            <div><span class="eyebrow">OPERATIONS CENTER</span><h1>Good day, <span id="welcomeName">team</span></h1><p>Here’s what’s happening with your exchange requests.</p></div>
-            <button class="button button--dark" data-open-requests>View all requests <span>→</span></button>
+          <div class="page-heading"><div><h1>Overview</h1><p>Verified requests and exchange activity.</p></div><button class="button button--dark" data-open-requests>Open request queue</button></div>
+          <div class="notice notice--paused hidden" id="serviceNotice" role="status"><div><strong>Requests are paused</strong><span id="serviceNoticeText">Customers cannot submit requests until you enable the offer.</span></div><button class="button button--small" data-open-settings id="noticeSettings">Exchange settings</button></div>
+          <div class="summary-grid" aria-label="Request summary">
+            <article class="summary-card"><span>Awaiting contact</span><strong id="verifiedCount">0</strong><small>Verified requests needing a reply</small></article>
+            <article class="summary-card"><span>Contacted</span><strong id="contactedCount">0</strong><small>Customers reached by the team</small></article>
+            <article class="summary-card"><span>In progress</span><strong id="activeCount">0</strong><small>Exchanges being handled</small></article>
+            <article class="summary-card"><span>Completed</span><strong id="completedCount">0</strong><small>Closed exchanges</small></article>
           </div>
-          <div class="notice notice--paused hidden" id="serviceNotice" role="status"><span class="notice__icon">Ⅱ</span><div><strong>New requests are paused</strong><span id="serviceNoticeText">Customers can’t submit an exchange until the service is enabled.</span></div><button class="button button--small" data-open-settings id="noticeSettings">Review settings</button></div>
-
-          <div class="metric-grid">
-            <article class="metric-card metric-card--amber"><div class="metric-card__top"><span class="metric-icon">◷</span><span class="metric-kicker">NEEDS ATTENTION</span></div><strong class="metric-value" id="verifiedCount">0</strong><div class="metric-card__bottom"><span>Awaiting contact</span><span class="metric-arrow">↗</span></div></article>
-            <article class="metric-card metric-card--blue"><div class="metric-card__top"><span class="metric-icon">☏</span><span class="metric-kicker">CUSTOMER REACHED</span></div><strong class="metric-value" id="contactedCount">0</strong><div class="metric-card__bottom"><span>Contacted</span><span class="metric-arrow">↗</span></div></article>
-            <article class="metric-card metric-card--violet"><div class="metric-card__top"><span class="metric-icon">⇄</span><span class="metric-kicker">IN PROGRESS</span></div><strong class="metric-value" id="activeCount">0</strong><div class="metric-card__bottom"><span>Active exchanges</span><span class="metric-arrow">↗</span></div></article>
-            <article class="metric-card metric-card--green"><div class="metric-card__top"><span class="metric-icon">✓</span><span class="metric-kicker">SUCCESSFULLY CLOSED</span></div><strong class="metric-value" id="completedCount">0</strong><div class="metric-card__bottom"><span>Completed</span><span class="metric-arrow">↗</span></div></article>
+          <div class="dashboard-content">
+            <section class="panel recent-panel"><div class="section-heading section-heading--table"><div><h2>Recent requests</h2><p>Open a request to view the customer and update its status.</p></div><button class="button button--light" data-open-requests>View all</button></div><div id="recent" class="table-mount"></div></section>
+            <section class="panel offer-panel"><div class="section-heading"><h2>Current offer</h2><span class="offer-state" id="dashboardAvailability">Loading</span></div><p class="offer-direction">USDT · TRC20 <span>→</span> Money Go · USD</p><div class="offer-rate"><strong id="offerRate">—</strong><span>USD per 1 USDT</span></div><div class="offer-range"><span>Minimum <strong id="offerMin">—</strong></span><span>Maximum <strong id="offerMax">—</strong></span></div><button class="button button--light button--wide" data-open-settings id="offerManage">Edit offer</button></section>
           </div>
-
-          <div class="dashboard-grid">
-            <section class="panel pipeline-panel">
-              <div class="section-heading"><div><span class="eyebrow">REQUEST WORKFLOW</span><h2>Exchange pipeline</h2></div><span class="live-pill"><i></i> LIVE</span></div>
-              <div class="pipeline" id="pipeline">
-                <div class="pipeline-step pipeline-step--amber"><span class="pipeline-step__number" id="pipelineVerified">0</span><span>Awaiting contact</span><i></i></div>
-                <div class="pipeline-step pipeline-step--blue"><span class="pipeline-step__number" id="pipelineContacted">0</span><span>Contacted</span><i></i></div>
-                <div class="pipeline-step pipeline-step--violet"><span class="pipeline-step__number" id="pipelineProgress">0</span><span>In progress</span><i></i></div>
-                <div class="pipeline-step pipeline-step--green"><span class="pipeline-step__number" id="pipelineCompleted">0</span><span>Completed</span></div>
-              </div>
-              <div class="pipeline-foot"><span>Requests move through each stage as your team works with the customer.</span><button class="text-button" data-open-requests>Open request queue →</button></div>
-            </section>
-            <section class="panel offer-panel">
-              <div class="section-heading"><div><span class="eyebrow">CUSTOMER OFFER</span><h2>Current exchange rate</h2></div><span class="offer-symbol">↗</span></div>
-              <div class="offer-pair"><span class="coin coin--usdt">₮</span><span class="offer-pair__label">USDT <small>TRC20</small></span><span class="offer-equals">→</span><span class="coin coin--usd">$</span><span class="offer-pair__label">Money Go <small>USD</small></span></div>
-              <div class="offer-rate"><strong id="offerRate">Not set</strong><span>USD per USDT</span></div>
-              <div class="offer-range"><span>Minimum <strong id="offerMin">—</strong></span><span>Maximum <strong id="offerMax">—</strong></span></div>
-              <button class="button button--light button--wide" data-open-settings id="offerManage">Manage offer settings <span>→</span></button>
-            </section>
-          </div>
-
-          <section class="panel recent-panel">
-            <div class="section-heading section-heading--table"><div><span class="eyebrow">LATEST ACTIVITY</span><h2>Recent requests</h2></div><button class="button button--light" data-open-requests>All requests <span>→</span></button></div>
-            <div id="recent" class="table-mount"></div>
-          </section>
         </section>
 
         <section id="requestsView" class="view hidden">
-          <div class="page-heading"><div><span class="eyebrow">CUSTOMER OPERATIONS</span><h1>Exchange requests</h1><p>Review verified requests and manage each exchange through completion.</p></div><span class="queue-total"><strong id="requestTotal">—</strong><span>matching requests</span></span></div>
+          <div class="page-heading"><div><h1>Exchange requests</h1><p>Review customer details and update each request as work progresses.</p></div><span class="queue-total"><strong id="requestTotal">—</strong><span>matching requests</span></span></div>
           <section class="panel requests-panel">
             <div class="filters"><label class="filter-search"><span>⌕</span><input id="search" placeholder="Search reference, name, email or WhatsApp"></label><label class="filter-select"><span>Status</span><select id="statusFilter"><option value="">All statuses</option><option value="verified">Awaiting contact</option><option value="contacted">Contacted</option><option value="in_progress">In progress</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select></label><label class="filter-date"><span>From</span><input id="fromDate" type="date"></label><label class="filter-date"><span>To</span><input id="toDate" type="date"></label><button class="button button--primary" id="filterBtn">Apply filters</button></div>
             <div id="requestList" class="table-mount"></div>
@@ -123,17 +98,17 @@
         </section>
 
         <section id="settingsView" class="view hidden">
-          <div class="page-heading"><div><span class="eyebrow">ADMINISTRATION</span><h1>Exchange settings</h1><p>Control the customer quote and whether new requests are accepted.</p></div><span class="settings-lock">⌑ <span>Admin controls</span></span></div>
+          <div class="page-heading"><div><h1>Exchange settings</h1><p>Set the rate, limits, notifications and availability.</p></div><span class="settings-lock">Administrators only</span></div>
           <form class="panel form settings-panel" id="settingsForm">
-            <div class="form-section"><span class="eyebrow">CUSTOMER QUOTE</span><h2>Rate and exchange limits</h2><p>These values are shown to customers and stored with every verified quote.</p><div class="row"><label>Customer rate <span class="input-suffix"><input id="settingRate" inputmode="decimal" placeholder="0.00" required><i>USD / USDT</i></span></label><label>Minimum amount <span class="input-suffix"><input id="settingMin" inputmode="decimal" placeholder="0.00" required><i>USDT</i></span></label><label>Maximum amount <span class="input-suffix"><input id="settingMax" inputmode="decimal" placeholder="0.00" required><i>USDT</i></span></label></div></div>
-            <div class="form-section"><span class="eyebrow">OPERATIONS</span><h2>Notifications and contact</h2><label>Operations notification email<input id="settingEmail" type="email" placeholder="operations@dahabipay.com"></label><label>WhatsApp message template<textarea id="settingMessage" required rows="4"></textarea><small>Use {{name}}, {{reference}}, {{send}}, and {{receive}} to personalize each message.</small></label></div>
-            <div class="form-section form-section--last"><div class="availability-row"><div><span class="eyebrow">PUBLIC AVAILABILITY</span><h2>Accept new exchange requests</h2><p>Turn this on only after the rate, limits, and email flow have been tested.</p></div><label class="toggle"><input id="settingEnabled" type="checkbox"><span></span></label></div><div class="settings-actions"><p class="error" id="settingsError" role="status"></p><button class="button button--primary">Save changes</button></div></div>
+            <div class="form-section"><h2>Customer quote</h2><p>Changes apply to new quotes. Existing quotes remain valid for 15 minutes.</p><div class="row"><label>Customer rate <span class="input-suffix"><input id="settingRate" inputmode="decimal" placeholder="0.00" required><i>USD / USDT</i></span></label><label>Minimum amount <span class="input-suffix"><input id="settingMin" inputmode="decimal" placeholder="0.00" required><i>USDT</i></span></label><label>Maximum amount <span class="input-suffix"><input id="settingMax" inputmode="decimal" placeholder="0.00" required><i>USDT</i></span></label></div></div>
+            <div class="form-section"><h2>Notifications</h2><label>Send new request alerts to<input id="settingEmail" type="email" placeholder="operations@dahabipay.com"><small class="setting-help">This address receives an email when a verified customer submits a request. Verification codes are sent separately through Supabase Auth.</small></label><label>WhatsApp message template<textarea id="settingMessage" required rows="4"></textarea><small>Available fields: {{name}}, {{reference}}, {{send}} and {{receive}}.</small></label></div>
+            <div class="form-section form-section--last"><div class="availability-row"><div><h2>Accept new requests</h2><p>Customers can continue past the quote only when this is on.</p></div><label class="toggle" aria-label="Accept new requests"><input id="settingEnabled" type="checkbox"><span></span></label></div><div class="settings-actions"><p class="error" id="settingsError" role="status"></p><button class="button button--primary">Save settings</button></div></div>
           </form>
         </section>
         <section id="staffView" class="view hidden">
-          <div class="page-heading"><div><span class="eyebrow">ADMINISTRATION</span><h1>Staff accounts</h1><p>Create administrators and operators. Each signs in with a password and email code.</p></div></div>
+          <div class="page-heading"><div><h1>Staff accounts</h1><p>Create administrators and operators. Staff sign in with a password and email code.</p></div></div>
           <form class="panel form settings-panel" id="staffForm">
-            <div class="form-section"><span class="eyebrow">NEW STAFF ACCOUNT</span><h2>Add a team member</h2><div class="row"><label>Full name<input id="staffDisplayName" maxlength="120" autocomplete="off" required></label><label>Username<input id="staffUsername" maxlength="32" pattern="[a-z][a-z0-9_]{2,31}" autocomplete="off" required></label><label>Email<input id="staffEmail" type="email" autocomplete="off" required></label></div><div class="row"><label>Role<select id="staffRoleSelect"><option value="operator">Operator</option><option value="admin">Administrator</option></select></label><label>Initial password<input id="staffPassword" type="password" autocomplete="new-password" minlength="12" required></label></div><small>Use 12 or more characters with uppercase, lowercase and a number. Share the initial password privately; the staff member must also verify their email code.</small><div class="settings-actions"><p class="error" id="staffError" role="status"></p><button class="button button--primary">Create account</button></div></div>
+            <div class="form-section"><h2>Add a team member</h2><div class="row"><label>Full name<input id="staffDisplayName" maxlength="120" autocomplete="off" required></label><label>Username<input id="staffUsername" maxlength="32" pattern="[a-z][a-z0-9_]{2,31}" autocomplete="off" required></label><label>Email<input id="staffEmail" type="email" autocomplete="off" required></label></div><div class="row"><label>Role<select id="staffRoleSelect"><option value="operator">Operator</option><option value="admin">Administrator</option></select></label><label>Initial password<span class="password-control"><input id="staffPassword" type="password" autocomplete="new-password" minlength="12" required><button type="button" data-password-toggle="staffPassword" aria-label="Show password" aria-pressed="false">Show</button></span></label></div><small>Use at least 12 characters, including uppercase, lowercase and a number. Share the password privately.</small><div class="settings-actions"><p class="error" id="staffError" role="status"></p><button class="button button--primary">Create account</button></div></div>
           </form>
           <section class="panel staff-panel"><div class="section-heading"><div><span class="eyebrow">ACCESS CONTROL</span><h2>Team members</h2></div></div><div id="staffList" class="table-mount"></div></section>
         </section>

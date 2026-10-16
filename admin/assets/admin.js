@@ -14,6 +14,16 @@ const label = (v) => ({ verified: 'Verified', contacted: 'Contacted', in_progres
 function badge(status) { return '<span class="badge" data-status="' + esc(status) + '">' + esc(label(status)) + '</span>'; }
 const initials = (value) => String(value || 'D').trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase();
 
+$$('[data-password-toggle]').forEach((button) => button.addEventListener('click', () => {
+  const input = $('#' + button.dataset.passwordToggle);
+  const showing = input.type === 'password';
+  input.type = showing ? 'text' : 'password';
+  button.textContent = showing ? 'Hide' : 'Show';
+  button.setAttribute('aria-label', showing ? 'Hide password' : 'Show password');
+  button.setAttribute('aria-pressed', String(showing));
+  input.focus();
+}));
+
 async function bootstrap() {
   try {
     const result = await api('/auth/setup-state'); state.staff = result.staff;
@@ -46,7 +56,6 @@ $('#setupForm').addEventListener('submit', async (event) => {
 async function enterApp() {
   $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
   $('#staffName').textContent = state.staff.displayName; $('#staffRole').textContent = state.staff.role;
-  $('#welcomeName').textContent = (state.staff.displayName || 'team').split(' ')[0];
   $('#staffAvatar').textContent = $('#topAvatar').textContent = initials(state.staff.displayName);
   $('#todayLabel').textContent = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
   if (state.staff.role !== 'admin') {
@@ -92,8 +101,6 @@ async function loadDashboard() {
   const data = await api('/dashboard');
   $('#verifiedCount').textContent = data.counts.verified || 0; $('#contactedCount').textContent = data.counts.contacted || 0;
   $('#activeCount').textContent = data.counts.in_progress || 0; $('#completedCount').textContent = data.counts.completed || 0;
-  $('#pipelineVerified').textContent = data.counts.verified || 0; $('#pipelineContacted').textContent = data.counts.contacted || 0;
-  $('#pipelineProgress').textContent = data.counts.in_progress || 0; $('#pipelineCompleted').textContent = data.counts.completed || 0;
   $('#navRequestCount').textContent = (data.counts.verified || 0) + (data.counts.contacted || 0) + (data.counts.in_progress || 0);
   renderTable($('#recent'), data.recent);
 }
@@ -102,7 +109,7 @@ async function loadRequests() {
   const data = await api('/requests?' + params); $('#requestTotal').textContent = data.total; renderTable($('#requestList'), data.requests);
 }
 function renderTable(target, rows) {
-  if (!rows?.length) { target.innerHTML = '<div class="empty">No requests found.</div>'; return; }
+  if (!rows?.length) { target.innerHTML = '<div class="empty"><strong>No requests yet</strong><span>Verified customer requests will appear here after submission.</span></div>'; return; }
   target.innerHTML = '<table class="table"><thead><tr><th>REFERENCE</th><th>CUSTOMER</th><th>YOU SEND</th><th>THEY RECEIVE</th><th>STATUS</th><th>RECEIVED</th></tr></thead><tbody>' +
     rows.map((r) => '<tr data-id="' + esc(r.id) + '"><td class="table__ref">' + esc(r.reference) + '</td><td><div class="table__customer"><span class="table__customer-avatar">' + esc(initials(r.full_name)) + '</span><span><strong>' + esc(r.full_name) + '</strong><small>' + esc(r.email) + '</small></span></div></td><td class="table__amount"><strong>' + money(r.send_usdt, 2) + ' USDT</strong><small>TRC20</small></td><td class="table__amount"><strong>' + money(r.receive_usd) + ' USD</strong><small>Money Go</small></td><td>' + badge(r.status) + '</td><td>' + esc(date(r.created_at)) + '</td></tr>').join('') +
     '</tbody></table>';
@@ -136,6 +143,8 @@ function renderServiceStatus() {
   const settings = state.settings || {};
   const configured = Number(settings.rate) > 0 && Number(settings.min_usdt) > 0 && Number(settings.max_usdt) >= Number(settings.min_usdt);
   const enabled = Boolean(settings.accepting_requests && configured);
+  $('#dashboardAvailability').textContent = !configured ? 'Setup needed' : enabled ? 'Accepting requests' : 'Paused';
+  $('#dashboardAvailability').classList.toggle('offer-state--on', enabled);
   $('#sidebarServiceState').textContent = !configured ? 'Setup required' : enabled ? 'Accepting requests' : 'Requests paused';
   $('#sidebarStatusHint').textContent = !configured ? 'Set a valid rate and amount range' : enabled ? 'Customers can submit requests' : 'Customers cannot submit requests';
   $('#sidebarStatusDot').classList.toggle('is-on', enabled);

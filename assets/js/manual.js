@@ -97,12 +97,17 @@ async function loadOffer() {
     $('#limits').textContent = state.offer.minUsdt ? money(state.offer.minUsdt, 0) + '–' + money(state.offer.maxUsdt, 0) + ' USDT' : '—';
     $('#offerStatus').classList.toggle('offer-status--paused', !state.offer.available);
     $('#offerStatus').textContent = state.offer.available ? 'Requests are open · Enter an amount to continue' : 'Requests are paused · You can preview the rate, but cannot send a request right now.';
+    $('#checkAvailability').classList.toggle('hidden', state.offer.available);
     $('#quoteBtn').textContent = state.offer.available ? 'Accept quote & continue' : 'Requests are paused';
     $('#quoteHelp').textContent = state.offer.available ? 'Next: you’ll enter your details and verify your email. No password is needed.' : 'Continue is unavailable while requests are paused. Please return later or contact support@dahabipay.com.';
     $('#quoteBtn').disabled = !state.offer.available;
     renderEstimate();
-  } catch (e) { $('#offerStatus').classList.add('offer-status--paused'); $('#offerStatus').textContent = 'The current offer could not be loaded. Please try again shortly.'; $('#quoteBtn').textContent = 'Quote unavailable'; error(e.message); }
+  } catch (e) { $('#offerStatus').classList.add('offer-status--paused'); $('#offerStatus').textContent = 'The current offer could not be loaded. Please try again shortly.'; $('#checkAvailability').classList.remove('hidden'); $('#quoteBtn').textContent = 'Quote unavailable'; error(e.message); }
 }
+$('#checkAvailability').addEventListener('click', async () => {
+  const button = $('#checkAvailability'); button.disabled = true; button.textContent = 'Checking…';
+  try { await loadOffer(); } finally { button.disabled = false; button.textContent = 'Check availability again'; }
+});
 $('#amount').addEventListener('input', renderEstimate);
 $('#whatsapp').addEventListener('input', updateWhatsappPreview);
 $('#countryPickerButton').addEventListener('click', () => $('#countryPicker').classList.contains('hidden') ? openCountryPicker() : closeCountryPicker());
@@ -171,6 +176,7 @@ function setSignedIn() {
   $('#email').value = state.customer.email;
   $('#email').readOnly = true;
   $('#emailHint').textContent = 'Signed in. Your requests are saved to this email account.';
+  $('#detailsIntro').textContent = 'Your quote is ready. Add your contact and Money Go details, then continue to review your request. You’re already signed in.';
   $('#otpBtn').textContent = 'Continue to review';
   $('#otpBtn').dataset.label = 'Continue to review';
 }

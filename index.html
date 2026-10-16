@@ -26,6 +26,7 @@
       <section data-step="1">
         <h2>Get your quote</h2><p class="muted">Enter the USDT amount to preview how much Money Go USD you’ll receive.</p>
         <div class="offer-status" id="offerStatus" role="status">Loading the current offer…</div>
+        <button class="check-availability hidden" id="checkAvailability" type="button">Check availability again</button>
         <div class="pair"><div class="asset"><span class="coin">₮</span><div><strong>You send</strong><small>Tether USDT · TRC20</small></div></div></div>
         <div class="field"><label for="amount">Amount you want to exchange</label><div class="input-wrap"><input id="amount" inputmode="decimal" autocomplete="off" placeholder="e.g. 100" aria-describedby="amountHelp"><span class="suffix">USDT</span></div><small class="field-hint" id="amountHelp">Enter an amount within the limits shown below.</small></div>
         <div class="pair"><div class="asset"><span class="coin money">$</span><div><strong>You receive</strong><small>Money Go · USD</small></div></div><strong id="receive">$0.00</strong></div>
@@ -35,7 +36,7 @@
         <p class="next-step" id="quoteHelp">Next: you’ll enter your details and verify your email. No password is needed.</p>
       </section>
       <section data-step="2" class="hidden">
-        <h2>Your details</h2><p class="muted">Your quote is ready. Add your contact and payout details, then we’ll email a code to create or sign in to your account automatically.</p>
+        <h2>Your details</h2><p class="muted" id="detailsIntro">Your quote is ready. Add your contact and payout details, then we’ll email a code to create or sign in to your account automatically.</p>
         <div class="step-summary" id="detailsQuote"></div>
         <div class="field"><label for="fullName">Full name</label><input id="fullName" autocomplete="name" placeholder="Your full name"></div>
         <div class="field"><label for="email">Email</label><input id="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com"><small class="field-hint" id="emailHint">We’ll send a sign-in code to this address.</small></div>

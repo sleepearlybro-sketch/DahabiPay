@@ -15,7 +15,7 @@ function appFor(role) {
     updateSettings: async (values) => { calls.push(values); return values; }
   };
   const app = express(); app.use(express.json());
-  app.use((req, _res, next) => { req.staff = { staff: { user_id: 'staff-1', role, email: 'staff@example.com', display_name: 'Staff' }, session: {} }; next(); });
+  app.use((req, _res, next) => { req.staff = { staff: { user_id: 'staff-1', role, email: 'staff@example.com', display_name: 'Staff', password_enabled: true }, session: {} }; next(); });
   app.use('/api/admin', createAdminRouter({ store }));
   app.use((error, _req, res, _next) => res.status(error.status || 500).json({ error: error.message }));
   return { app, calls };

@@ -16,21 +16,31 @@ const initials = (value) => String(value || 'D').trim().split(/\s+/).slice(0, 2)
 
 async function bootstrap() {
   try {
-    const result = await api('/me'); state.staff = result.staff; enterApp();
+    const result = await api('/auth/setup-state'); state.staff = result.staff;
+    if (!state.staff.passwordEnabled) showSetup(); else enterApp();
   } catch { $('#login').classList.remove('hidden'); }
 }
+function showSetup() { $('#login').classList.remove('hidden'); $('#loginForm').classList.add('hidden'); $('#setupForm').classList.remove('hidden'); }
 $('#loginForm').addEventListener('submit', async (event) => {
   event.preventDefault(); const button = $('#loginButton'); button.disabled = true; $('#loginError').textContent = '';
   try {
-    const email = $('#loginEmail').value;
+    const identifier = $('#loginEmail').value;
     if (state.loginStep === 'email') {
-      await api('/auth/otp', { method: 'POST', body: JSON.stringify({ email }) });
-      state.loginStep = 'code'; $('#codeField').classList.remove('hidden'); $('#loginEmail').readOnly = true; button.textContent = 'Verify and sign in'; $('#loginCode').focus();
+      await api('/auth/otp', { method: 'POST', body: JSON.stringify({ identifier, password: $('#loginPassword').value }) });
+      state.loginStep = 'code'; $('#codeField').classList.remove('hidden'); $('#passwordField').classList.add('hidden'); $('#loginEmail').readOnly = true; button.textContent = 'Verify and sign in'; $('#loginCode').focus();
     } else {
-      const result = await api('/auth/verify', { method: 'POST', body: JSON.stringify({ email, otp: $('#loginCode').value }) });
-      state.staff = result.staff; enterApp();
+      const result = await api('/auth/verify', { method: 'POST', body: JSON.stringify({ identifier, otp: $('#loginCode').value }) });
+      state.staff = result.staff; if (!state.staff.passwordEnabled) showSetup(); else enterApp();
     }
   } catch (error) { $('#loginError').textContent = error.message; }
+  finally { button.disabled = false; }
+});
+$('#setupForm').addEventListener('submit', async (event) => {
+  event.preventDefault(); $('#setupError').textContent = ''; const button = event.submitter; button.disabled = true;
+  try {
+    const result = await api('/auth/setup', { method: 'POST', body: JSON.stringify({ username: $('#setupUsername').value, password: $('#setupPassword').value }) });
+    state.staff = result.staff; $('#setupForm').classList.add('hidden'); enterApp();
+  } catch (error) { $('#setupError').textContent = error.message; }
   finally { button.disabled = false; }
 });
 async function enterApp() {
@@ -41,6 +51,7 @@ async function enterApp() {
   $('#todayLabel').textContent = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
   if (state.staff.role !== 'admin') {
     $('[data-view="settings"]').classList.add('hidden');
+    $('[data-view="staff"]').classList.add('hidden');
     $$('#noticeSettings, #offerManage, [data-open-settings]').forEach((button) => button.classList.add('hidden'));
     $('.settings-lock').classList.add('hidden');
   }
@@ -54,11 +65,29 @@ $$('[data-open-settings]').forEach((button) => button.addEventListener('click', 
 $('#mobileMenu').addEventListener('click', () => $('#sidebar').classList.toggle('is-open'));
 function setView(view) {
   $$('aside nav button').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
-  ['dashboard', 'requests', 'settings'].forEach((name) => $('#' + name + 'View').classList.toggle('hidden', name !== view));
-  $('#crumbTitle').textContent = ({ dashboard: 'Overview', requests: 'Exchange requests', settings: 'Settings' })[view];
+  ['dashboard', 'requests', 'settings', 'staff'].forEach((name) => $('#' + name + 'View').classList.toggle('hidden', name !== view));
+  $('#crumbTitle').textContent = ({ dashboard: 'Overview', requests: 'Exchange requests', settings: 'Settings', staff: 'Staff accounts' })[view];
   $('#sidebar').classList.remove('is-open');
   if (view === 'requests') loadRequests();
+  if (view === 'staff') loadStaff();
 }
+async function loadStaff() {
+  const data = await api('/staff');
+  $('#staffList').innerHTML = '<table class="table"><thead><tr><th>NAME</th><th>USERNAME</th><th>EMAIL</th><th>ROLE</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody>' + data.staff.map((s) => '<tr><td>' + esc(s.displayName) + '</td><td>' + esc(s.username || '—') + '</td><td>' + esc(s.email) + '</td><td>' + esc(s.role) + '</td><td>' + (s.active ? 'Active' : 'Disabled') + '</td><td>' + (s.id === state.staff.id ? 'Your account' : '<button class="button button--light" data-staff-id="' + esc(s.id) + '" data-staff-active="' + s.active + '">' + (s.active ? 'Disable' : 'Activate') + '</button>') + '</td></tr>').join('') + '</tbody></table>';
+  $$('[data-staff-id]', $('#staffList')).forEach((button) => button.addEventListener('click', async () => {
+    button.disabled = true;
+    try { await api('/staff/' + button.dataset.staffId, { method: 'PATCH', body: JSON.stringify({ active: button.dataset.staffActive !== 'true' }) }); await loadStaff(); }
+    catch (error) { alert(error.message); button.disabled = false; }
+  }));
+}
+$('#staffForm').addEventListener('submit', async (event) => {
+  event.preventDefault(); $('#staffError').textContent = ''; const button = event.submitter; button.disabled = true;
+  try {
+    await api('/staff', { method: 'POST', body: JSON.stringify({ displayName: $('#staffDisplayName').value, username: $('#staffUsername').value, email: $('#staffEmail').value, role: $('#staffRoleSelect').value, password: $('#staffPassword').value }) });
+    $('#staffForm').reset(); $('#staffError').style.color = '#16834b'; $('#staffError').textContent = 'Staff account created.'; await loadStaff();
+  } catch (error) { $('#staffError').style.color = ''; $('#staffError').textContent = error.message; }
+  finally { button.disabled = false; }
+});
 async function loadDashboard() {
   const data = await api('/dashboard');
   $('#verifiedCount').textContent = data.counts.verified || 0; $('#contactedCount').textContent = data.counts.contacted || 0;

@@ -12,11 +12,13 @@ export async function attachStaff(req, _res, next) {
 
 export function requireStaff(req, res, next) {
   if (!req.staff) return res.status(401).json({ error: 'Staff sign-in required' });
+  if (!req.staff.staff.password_enabled) return res.status(428).json({ error: 'Set a username and password before continuing' });
   next();
 }
 
 export function requireAdmin(req, res, next) {
   if (!req.staff) return res.status(401).json({ error: 'Staff sign-in required' });
+  if (!req.staff.staff.password_enabled) return res.status(428).json({ error: 'Set a username and password before continuing' });
   if (req.staff.staff.role !== 'admin') return res.status(403).json({ error: 'Administrator access required' });
   next();
 }

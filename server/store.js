@@ -69,6 +69,35 @@ export async function findActiveStaffByEmail(email) {
   return throwIfError(result, 'Find staff account');
 }
 
+export async function findActiveStaffByIdentifier(identifier) {
+  const field = identifier.includes('@') ? 'email' : 'username';
+  return throwIfError(await db().from('staff_profiles').select('*').eq(field, identifier).eq('active', true).maybeSingle(), 'Find staff account');
+}
+
+export async function listStaff() {
+  return throwIfError(await db().from('staff_profiles').select('user_id,email,username,display_name,role,active,password_enabled,created_at').order('created_at'), 'List staff');
+}
+
+export async function createStaffProfile(profile) {
+  return throwIfError(await db().from('staff_profiles').insert(profile).select().single(), 'Create staff profile');
+}
+
+export async function setStaffCredentials(userId, username) {
+  return throwIfError(await db().from('staff_profiles').update({ username, password_enabled: true, updated_at: new Date().toISOString() }).eq('user_id', userId).select().single(), 'Set staff credentials');
+}
+
+export async function setStaffActive(userId, active) {
+  return throwIfError(await db().from('staff_profiles').update({ active, updated_at: new Date().toISOString() }).eq('user_id', userId).select().single(), 'Update staff account');
+}
+
+export async function revokeStaffSessions(userId) {
+  throwIfError(await db().from('staff_sessions').delete().eq('staff_user_id', userId), 'Revoke staff sessions');
+}
+
+export async function auditStaff(actorId, eventType, targetId) {
+  throwIfError(await db().from('request_events').insert({ actor_staff_id: actorId, event_type: eventType, detail: { targetStaffId: targetId } }), 'Audit staff action');
+}
+
 export async function createStaffSession({ tokenHash, staffUserId, expiresAt, ip, userAgent }) {
   return throwIfError(await db().from('staff_sessions').insert({
     token_hash: tokenHash,

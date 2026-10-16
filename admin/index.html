@@ -14,12 +14,22 @@
       <a class="brand brand--login" href="/"><b>D</b><span>Dahabi Pay<small>OPERATIONS</small></span></a>
       <span class="eyebrow">SECURE STAFF ACCESS</span>
       <h1>Welcome back</h1>
-      <p>Sign in with your authorized staff email. We’ll send you an eight-digit verification code.</p>
-      <label>Email address<input id="loginEmail" type="email" autocomplete="email" placeholder="you@company.com" required></label>
+      <p>Enter your username or email and password. We’ll send an eight-digit code to your staff email.</p>
+      <label>Username or email<input id="loginEmail" autocomplete="username" placeholder="you@company.com or username" required></label>
+      <label id="passwordField">Password<input id="loginPassword" type="password" autocomplete="current-password" placeholder="Your password"></label>
+      <small>Existing admin signing in for the first time? Leave the password blank, verify your email, then set one.</small>
       <label id="codeField" class="hidden">Verification code<input id="loginCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Enter 8-digit code"></label>
       <p class="error" id="loginError" role="alert"></p>
       <button class="button button--primary button--wide" id="loginButton">Send sign-in code</button>
       <p class="login__foot">Manual exchange operations · Secure staff portal</p>
+    </form>
+    <form class="login__card hidden" id="setupForm">
+      <span class="eyebrow">ONE-TIME ADMIN SETUP</span><h1>Secure your account</h1>
+      <p>Choose a username and password to protect future sign-ins. Your next login will require both and an email code.</p>
+      <label>Username<input id="setupUsername" autocomplete="username" pattern="[a-z][a-z0-9_]{2,31}" required></label>
+      <label>Password<input id="setupPassword" type="password" autocomplete="new-password" minlength="12" required></label>
+      <small>12 or more characters with uppercase, lowercase and a number.</small>
+      <p class="error" id="setupError" role="alert"></p><button class="button button--primary button--wide">Save credentials</button>
     </form>
   </section>
 
@@ -35,6 +45,7 @@
         <button class="nav__item" data-view="requests"><span class="nav__icon">▤</span><span>Exchange requests</span><span class="nav__count" id="navRequestCount">0</span></button>
         <span class="nav__label nav__label--secondary">CONFIGURATION</span>
         <button class="nav__item" data-view="settings"><span class="nav__icon">⚙</span><span>Exchange settings</span></button>
+        <button class="nav__item" data-view="staff"><span class="nav__icon">♙</span><span>Staff accounts</span></button>
       </nav>
       <div class="sidebar__bottom">
         <div class="sidebar-status">
@@ -118,6 +129,13 @@
             <div class="form-section"><span class="eyebrow">OPERATIONS</span><h2>Notifications and contact</h2><label>Operations notification email<input id="settingEmail" type="email" placeholder="operations@dahabipay.com"></label><label>WhatsApp message template<textarea id="settingMessage" required rows="4"></textarea><small>Use {{name}}, {{reference}}, {{send}}, and {{receive}} to personalize each message.</small></label></div>
             <div class="form-section form-section--last"><div class="availability-row"><div><span class="eyebrow">PUBLIC AVAILABILITY</span><h2>Accept new exchange requests</h2><p>Turn this on only after the rate, limits, and email flow have been tested.</p></div><label class="toggle"><input id="settingEnabled" type="checkbox"><span></span></label></div><div class="settings-actions"><p class="error" id="settingsError" role="status"></p><button class="button button--primary">Save changes</button></div></div>
           </form>
+        </section>
+        <section id="staffView" class="view hidden">
+          <div class="page-heading"><div><span class="eyebrow">ADMINISTRATION</span><h1>Staff accounts</h1><p>Create administrators and operators. Each signs in with a password and email code.</p></div></div>
+          <form class="panel form settings-panel" id="staffForm">
+            <div class="form-section"><span class="eyebrow">NEW STAFF ACCOUNT</span><h2>Add a team member</h2><div class="row"><label>Full name<input id="staffDisplayName" maxlength="120" autocomplete="off" required></label><label>Username<input id="staffUsername" maxlength="32" pattern="[a-z][a-z0-9_]{2,31}" autocomplete="off" required></label><label>Email<input id="staffEmail" type="email" autocomplete="off" required></label></div><div class="row"><label>Role<select id="staffRoleSelect"><option value="operator">Operator</option><option value="admin">Administrator</option></select></label><label>Initial password<input id="staffPassword" type="password" autocomplete="new-password" minlength="12" required></label></div><small>Use 12 or more characters with uppercase, lowercase and a number. Share the initial password privately; the staff member must also verify their email code.</small><div class="settings-actions"><p class="error" id="staffError" role="status"></p><button class="button button--primary">Create account</button></div></div>
+          </form>
+          <section class="panel staff-panel"><div class="section-heading"><div><span class="eyebrow">ACCESS CONTROL</span><h2>Team members</h2></div></div><div id="staffList" class="table-mount"></div></section>
         </section>
       </div>
     </main>

@@ -41,6 +41,7 @@ app.use('/api/customer', customerRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/admin', express.static(path.join(ROOT, 'admin'), { index: 'index.html' }));
 app.use('/account', express.static(path.join(ROOT, 'account'), { index: 'index.html' }));
+app.get(['/contact', '/contact/'], (_req, res) => res.redirect(302, '/#contact'));
 
 const NEVER_SERVE = [/^\/data(\/|$)/, /^\/server(\/|$)/, /^\/supabase(\/|$)/, /^\/deploy(\/|$)/,
   /^\/node_modules(\/|$)/, /(^|\/)\.env/, /(^|\/)\.git(\/|$)/,

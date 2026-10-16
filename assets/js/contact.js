@@ -18,9 +18,10 @@ try {
     whatsapp.textContent = contact.whatsapp;
     whatsappDescription.textContent = 'Send us a message about your exchange request.';
     whatsappAction.href = `https://wa.me/${contact.whatsapp.slice(1)}?text=${encodeURIComponent('Hello Dahabi Pay, I have a question about an exchange request.')}`;
+    whatsapp.classList.remove('hidden');
     whatsappAction.classList.remove('hidden');
     whatsappUnavailable.classList.add('hidden');
   }
 } catch {
-  whatsappDescription.textContent = 'WhatsApp contact is unavailable right now. Please use email.';
+  whatsappDescription.textContent = 'After you submit a request, our team will contact you on WhatsApp to arrange the next steps.';
 }
